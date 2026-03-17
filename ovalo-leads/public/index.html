@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analizador de Leads — Ford Goldstein</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f4f0;
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    background: #003087;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo svg { width: 22px; height: 22px; }
+
+  header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.2;
+  }
+
+  header p {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 12px;
+    border: 1px solid #e8e6e0;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  label span { font-weight: 400; color: #aaa; text-transform: none; letter-spacing: 0; }
+
+  textarea {
+    width: 100%;
+    border: 1px solid #e0ddd6;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #1a1a1a;
+    background: #fafaf8;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s;
+    line-height: 1.5;
+  }
+
+  textarea:focus { border-color: #003087; background: #fff; }
+
+  #crm { min-height: 130px; }
+  #wa { min-height: 100px; }
+  #sensacion { min-height: 64px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+
+  button.primary {
+    width: 100%;
+    padding: 14px;
+    background: #003087;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    margin-bottom: 12px;
+  }
+
+  button.primary:hover { background: #00256b; }
+  button.primary:active { transform: scale(0.99); }
+  button.primary:disabled { background: #b0b8c8; cursor: not-allowed; }
+
+  #loading {
+    display: none;
+    text-align: center;
+    padding: 32px 0;
+    color: #888;
+    font-size: 14px;
+  }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 2.5px solid #e0ddd6;
+    border-top-color: #003087;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #errorBox {
+    display: none;
+    background: #fff2f2;
+    border: 1px solid #fcc;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+
+  #errorBox p { font-size: 13px; color: #c00; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
+
+  #resultado { display: none; }
+
+  .lead-titulo {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+
+  .score-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f4f0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-bottom: 20px;
+  }
+
+  .score-badge .num {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .score-badge .denom {
+    font-size: 14px;
+    color: #aaa;
+  }
+
+  .score-badge .cl {
+    font-size: 13px;
+    color: #555;
+    border-left: 1px solid #ddd;
+    padding-left: 10px;
+    margin-left: 2px;
+  }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .score-item {
+    background: #f5f4f0;
+    border-radius: 8px;
+    padding: 10px 10px 8px;
+    cursor: default;
+  }
+
+  .score-item .sl { font-size: 11px; color: #888; margin-bottom: 2px; }
+  .score-item .sv { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+  .score-item .sv span { font-size: 11px; color: #bbb; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #aaa;
+    margin-bottom: 8px;
+  }
+
+  .diagnostico-box {
+    background: #f5f4f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+
+  .diagnostico-box p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #333;
+    white-space: pre-line;
+  }
+
+  .mensaje-box {
+    background: #fff;
+    border: 1px solid #e0ddd6;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .mensaje-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  #mensajeTexto {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #1a1a1a;
+  }
+
+  button.copy {
+    font-size: 12px;
+    font-weight: 500;
+    color: #003087;
+    background: #e8eef7;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  button.copy:hover { background: #d0ddef; }
+
+  .planb-box {
+    border-left: 3px solid #d0ddd6;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+  }
+
+  .planb-box p { font-size: 13px; color: #555; line-height: 1.55; }
+
+  button.secondary {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  button.secondary:hover { background: #f0efe9; }
+
+  .tooltip {
+    position: relative;
+  }
+  .tooltip:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
+    color: #fff;
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    max-width: 220px;
+    white-space: normal;
+    z-index: 10;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="11" cy="11" rx="10" ry="6.5" stroke="white" stroke-width="1.5"/>
+        <path d="M4 8.5C4 8.5 7 13.5 11 13.5C15 13.5 18 8.5 18 8.5" stroke="white" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Analizador de Leads</h1>
+      <p>Plan Óvalo — Ford Goldstein Mendoza</p>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="field">
+      <label>Historial CRM <span>(Tecnom Nubux)</span></label>
+      <textarea id="crm" placeholder="Pegá el historial del CRM acá..."></textarea>
+    </div>
+    <div class="field">
+      <label>Historial WhatsApp <span>(opcional)</span></label>
+      <textarea id="wa" placeholder="Pegá la conversación de WhatsApp acá..."></textarea>
+    </div>
+    <div class="field">
+      <label>Tu sensación <span>(lo que el CRM no captura)</span></label>
+      <textarea id="sensacion" placeholder="Ej: creo que el tema es precio pero no lo dijo, se enfrió después de la segunda llamada..."></textarea>
+    </div>
+  </div>
+
+  <button class="primary" id="analizarBtn" onclick="analizar()">Analizar lead</button>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Analizando historial...</p>
+  </div>
+
+  <div id="errorBox"><p id="errorMsg"></p></div>
+
+  <div id="resultado">
+    <div class="card">
+      <div class="lead-titulo" id="tituloLead"></div>
+      <div class="score-badge">
+        <span id="scoreEmoji" style="font-size:20px"></span>
+        <span class="num" id="scoreNum"></span>
+        <span class="denom">/25</span>
+        <span class="cl" id="scoreCl"></span>
+      </div>
+      <div class="section-label">Detalle por criterio</div>
+      <div class="score-grid" id="scoreGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Diagnóstico</div>
+      <div class="diagnostico-box"><p id="diagnosticoTexto"></p></div>
+
+      <div class="section-label">Mensaje sugerido</div>
+      <div class="mensaje-box">
+        <div class="mensaje-header">
+          <span style="font-size:12px;color:#aaa;">Listo para WhatsApp</span>
+          <button class="copy" id="copiarBtn" onclick="copiarMensaje()">Copiar</button>
+        </div>
+        <p id="mensajeTexto"></p>
+      </div>
+
+      <div class="section-label">Plan B — si no responde en 5-7 días</div>
+      <div class="planb-box"><p id="planBTexto"></p></div>
+    </div>
+
+    <button class="secondary" onclick="resetear()">Analizar otro lead</button>
+  </div>
+
+</div>
+
+<script>
+async function analizar() {
+  const crm = document.getElementById('crm').value.trim();
+  const wa = document.getElementById('wa').value.trim();
+  const sensacion = document.getElementById('sensacion').value.trim();
+
+  if (!crm) { mostrarError('Pegá el historial del CRM para poder analizar.'); return; }
+
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('resultado').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('analizarBtn').disabled = true;
+
+  try {
+    const resp = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ crm, wa, sensacion })
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      mostrarError(JSON.stringify(data.error || data, null, 2));
+      return;
+    }
+
+    renderResultado(data);
+
+  } catch (e) {
+    mostrarError('Error de red: ' + e.message);
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('analizarBtn').disabled = false;
+  }
+}
+
+function renderResultado(r) {
+  document.getElementById('tituloLead').textContent = r.titulo || '';
+
+  const total = r.score?.total || 0;
+  const emoji = total >= 20 ? '🔥' : total >= 14 ? '🟡' : total >= 8 ? '🔵' : '⚫';
+  document.getElementById('scoreEmoji').textContent = emoji;
+  document.getElementById('scoreNum').textContent = total;
+  document.getElementById('scoreCl').textContent = r.clasificacion || '';
+
+  const criterios = [
+    { key: 'intencion', label: 'Intención' },
+    { key: 'capacidad_pago', label: 'Cap. de pago' },
+    { key: 'urgencia', label: 'Urgencia' },
+    { key: 'engagement', label: 'Engagement' },
+    { key: 'fit_producto', label: 'Fit producto' }
+  ];
+
+  document.getElementById('scoreGrid').innerHTML = criterios.map(c => {
+    const s = r.score?.[c.key] || {};
+    return `<div class="score-item tooltip" data-tip="${(s.nota || '').replace(/"/g, '&quot;')}">
+      <div class="sl">${c.label}</div>
+      <div class="sv">${s.puntaje || 0}<span>/5</span></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('diagnosticoTexto').textContent = r.diagnostico || '';
+  document.getElementById('mensajeTexto').textContent = r.mensaje || '';
+  document.getElementById('planBTexto').textContent = r.plan_b || '';
+
+  document.getElementById('resultado').style.display = 'block';
+  document.getElementById('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copiarMensaje() {
+  const msg = document.getElementById('mensajeTexto').textContent;
+  navigator.clipboard.writeText(msg).then(() => {
+    const btn = document.getElementById('copiarBtn');
+    btn.textContent = '¡Copiado!';
+    setTimeout(() => btn.textContent = 'Copiar', 2000);
+  });
+}
+
+function resetear() {
+  ['crm', 'wa', 'sensacion'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('resultado').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function mostrarError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorBox').style.display = 'block';
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('analizarBtn').disabled = false;
+}
+</script>
+</body>
+</html>
