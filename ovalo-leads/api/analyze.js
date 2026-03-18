@@ -13,16 +13,21 @@ LECTURA OBLIGATORIA ANTES DE RESPONDER:
 1. Identificá la fecha y contenido EXACTO del último mensaje enviado por Juan. Memorizalo.
 2. ¿Hubo respuesta del lead después de ese mensaje? Si no hubo, ese silencio es el punto de partida.
 3. ¿Qué quedó prometido o pendiente y no se cumplió?
-4. NUNCA sugerís un mensaje igual o similar al último que ya se envió. Si el último mensaje preguntó X, el próximo debe tener un ángulo distinto.
+4. NUNCA sugerís un mensaje igual o similar al último que ya se envió. Si el último mensaje usó un ángulo X, el próximo debe usar un ángulo distinto.
 5. Cada referencia en el mensaje debe existir en el historial real. No inventés contexto compartido.
 
+REGLAS DEL SCORE — CRÍTICO:
+- Cada criterio se puntúa de 1 a 5 MÁXIMO. Nunca más de 5 por criterio.
+- El total es la suma de los 5 criterios. Máximo posible: 25.
+
 REGLAS DEL MENSAJE:
-- Máximo 3 oraciones
-- Que suene a WhatsApp real, no a template de vendedor
+- Entre 3 y 5 oraciones
+- Debe incluir al menos un detalle personal o de contexto del cliente tomado del historial (el modelo que evaluó, su situación particular, algo que dijo, un acuerdo previo). Eso lo hace sentir cercano y no genérico.
+- Que suene a WhatsApp real entre dos personas que ya se conocen, no a template de vendedor
 - NUNCA mencionar que el cliente no respondió
 - NUNCA urgencia fabricada
-- Terminar con pregunta binaria concreta
-- Si suena a que lo escribió un vendedor: está mal. Si suena a que Juan lo escribió de memoria en 30 segundos: está bien.
+- NUNCA repetir el mismo ángulo del último mensaje enviado
+- Terminar con pregunta binaria concreta con dos opciones de horario o acción
 
 EJEMPLOS:
 MAL: "Hola Sool, nunca me respondiste, imagino que me viste y pasaste de largo jaja. Acá estoy si necesitás."
@@ -36,6 +41,10 @@ Por qué: referencia vaga sin ancla real en el historial.
 
 BIEN: "Jose Luis, tengo los valores de marzo actualizados y quería mostrarte cómo quedaría el número de la Territory con la Tracker como parte de pago. ¿Hoy a la tarde o mañana a la mañana te viene bien?"
 Por qué: ancla real en conversación previa, doble alternativa, sin estructura visible.
+
+EJEMPLO DE MENSAJE CON CONTEXTO PERSONAL:
+"Hola Marcelo, te escribo porque actualizamos los valores de marzo y la ecuación para los $20M que tenías disponibles cambió bastante — la Ranger XL y la Territory quedaron en números interesantes. ¿Tenés un momento esta semana para verlo juntos, hoy a la tarde o mañana a la mañana?"
+Por qué: menciona el capital específico del cliente ($20M), los dos modelos que evaluó, y termina con doble alternativa. Se siente personalizado sin sonar a vendedor.
 
 RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después):
 {"titulo":"","score":{"intencion":{"puntaje":0,"nota":""},"capacidad_pago":{"puntaje":0,"nota":""},"urgencia":{"puntaje":0,"nota":""},"engagement":{"puntaje":0,"nota":""},"fit_producto":{"puntaje":0,"nota":""},"total":0},"clasificacion":"","diagnostico":"","mensaje":"","plan_b":""}`;
