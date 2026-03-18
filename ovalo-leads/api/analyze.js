@@ -51,31 +51,28 @@ export default async function handler(req, res) {
   const { crm, wa, sensacion } = req.body;
   if (!crm) return res.status(400).json({ error: 'El historial CRM es requerido.' });
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY no configurada en Vercel.' });
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY no configurada en Vercel.' });
 
   let userContent = 'HISTORIAL CRM:\n' + crm;
   if (wa) userContent += '\n\nHISTORIAL WHATSAPP:\n' + wa;
   if (sensacion) userContent += '\n\nSENSACIÓN DE JUAN:\n' + sensacion;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-    const response = await fetch(url, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
       body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: SYSTEM_PROMPT }]
-        },
-        contents: [{
-          role: 'user',
-          parts: [{ text: userContent }]
-        }],
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 1000
-        }
+        model: 'llama-3.3-70b-versatile',
+        temperature: 0.3,
+        max_tokens: 1000,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userContent }
+        ]
       })
     });
 
@@ -85,7 +82,7 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ error: data });
     }
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const rawText = data?.choices?.[0]?.message?.content || '';
     const clean = rawText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
 
     let parsed;
