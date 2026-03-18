@@ -10,10 +10,10 @@ GRILLA VIGENTE MARZO 2026:
 TODOS los modelos Ford son accesibles por cambio de modelo. NUNCA digas que un modelo no tiene plan disponible.
 
 LECTURA OBLIGATORIA ANTES DE RESPONDER:
-1. Identificá fecha y contenido exacto del último mensaje enviado por Juan
-2. ¿Hubo respuesta del lead después? Si no, ese silencio es el punto de partida
+1. Identificá la fecha y contenido EXACTO del último mensaje enviado por Juan. Memorizalo.
+2. ¿Hubo respuesta del lead después de ese mensaje? Si no hubo, ese silencio es el punto de partida.
 3. ¿Qué quedó prometido o pendiente y no se cumplió?
-4. NUNCA sugerís algo que ya se mandó
+4. NUNCA sugerís un mensaje igual o similar al último que ya se envió. Si el último mensaje preguntó X, el próximo debe tener un ángulo distinto.
 5. Cada referencia en el mensaje debe existir en el historial real. No inventés contexto compartido.
 
 REGLAS DEL MENSAJE:
@@ -37,7 +37,7 @@ Por qué: referencia vaga sin ancla real en el historial.
 BIEN: "Jose Luis, tengo los valores de marzo actualizados y quería mostrarte cómo quedaría el número de la Territory con la Tracker como parte de pago. ¿Hoy a la tarde o mañana a la mañana te viene bien?"
 Por qué: ancla real en conversación previa, doble alternativa, sin estructura visible.
 
-RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después):
+RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después, sin comentarios, sin campos extra):
 {"titulo":"","score":{"intencion":{"puntaje":0,"nota":""},"capacidad_pago":{"puntaje":0,"nota":""},"urgencia":{"puntaje":0,"nota":""},"engagement":{"puntaje":0,"nota":""},"fit_producto":{"puntaje":0,"nota":""},"total":0},"clasificacion":"","diagnostico":"","mensaje":"","plan_b":""}`;
 
 export default async function handler(req, res) {
@@ -67,8 +67,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        temperature: 0.3,
+        temperature: 0.2,
         max_tokens: 1000,
+        response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userContent }
@@ -83,11 +84,24 @@ export default async function handler(req, res) {
     }
 
     const rawText = data?.choices?.[0]?.message?.content || '';
-    const clean = rawText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
 
     let parsed;
     try {
-      parsed = JSON.parse(clean);
+      parsed = JSON.parse(rawText);
+
+      // Si el modelo anidó todo dentro de otra key, lo extraemos
+      if (!parsed.titulo && !parsed.score) {
+        const keys = Object.keys(parsed);
+        if (keys.length === 1) parsed = parsed[keys[0]];
+      }
+
+      // Validar que el score tenga la estructura correcta
+      if (parsed.score && typeof parsed.score.total === 'undefined') {
+        const vals = ['intencion','capacidad_pago','urgencia','engagement','fit_producto']
+          .map(k => parsed.score[k]?.puntaje || 0);
+        parsed.score.total = vals.reduce((a, b) => a + b, 0);
+      }
+
     } catch (e) {
       return res.status(500).json({ error: 'JSON parse error', raw: rawText.substring(0, 500) });
     }
