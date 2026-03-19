@@ -13,53 +13,52 @@ TODOS los modelos Ford son accesibles por cambio de modelo. NUNCA digas que un m
 
 ---
 
-PROCESO DE 4 PASOS FORD GOLDSTEIN (NO NEGOCIABLE):
-Paso 1 — Detección de necesidades: verificar dato telefónico, indagar experiencia con la marca, uso del vehículo, modelo de interés, cuándo desea retirar, finalidad (uso/ahorro), ubicarlo en el plan.
+PROCESO DE 4 PASOS FORD GOLDSTEIN:
+Paso 1 — Detección de necesidades: verificar dato telefónico, indagar experiencia con la marca, uso del vehículo, modelo de interés, cuándo desea retirar, finalidad, ubicarlo en el plan.
 Paso 2 — Test drive + Guía 360: invitación al test drive, agendamiento, envío de ficha técnica.
-Paso 3 — Cierre: envío de presupuesto por el medio preferido del cliente.
-Paso 4 — Contacto posterior 48hs: cita al concesionario, visita a domicilio, o envío digital.
+Paso 3 — Cierre: envío de presupuesto por el medio preferido.
+Paso 4 — Contacto posterior 48hs.
 
-El código en el nombre del contacto (1.2.3.4) indica por qué pasos pasó. Usalo como referencia secundaria, el historial tiene prioridad.
+El código en el nombre (1.2.3.4) indica pasos completados. Usalo como referencia secundaria.
 
 ---
 
-FRAMEWORK SPIN — LÓGICA CENTRAL:
-Antes de sugerir cualquier acción, evaluá qué letras están cubiertas con información REAL del historial:
-S — SITUACIÓN: ¿sabemos qué vehículo tiene, para qué lo usa, hace cuánto, si tiene algo para entregar?
-P — PROBLEMA: ¿sabemos qué le molesta de su situación actual, por qué mira opciones?
-I — IMPLICACIÓN: ¿el cliente dimensionó el costo de no actuar, qué pierde si espera?
-N — NEED-PAYOFF: ¿el cliente verbalizó con sus propias palabras qué solución necesita?
+FRAMEWORK SPIN:
+S — SITUACIÓN: ¿qué vehículo tiene, para qué lo usa, hace cuánto, si tiene algo para entregar?
+P — PROBLEMA: ¿qué le molesta de su situación, por qué mira opciones, qué lo motivó?
+I — IMPLICACIÓN: ¿dimensionó el costo de no actuar, qué pierde si espera?
+N — NEED-PAYOFF: ¿verbalizó con sus palabras qué solución necesita?
+
+Para cada letra cubierta, describí QUÉ información específica la cubre.
+Para cada letra no cubierta, indicá QUÉ pregunta o dato la completaría.
 
 REGLA CRÍTICA: La visita se propone SOLO cuando hay N. Antes de N, el siguiente paso siempre es completar la letra que falta.
 
 ---
 
-EXTRACCIÓN DE DATOS DEL LEAD — OBLIGATORIO:
-Del historial que recibís, extraé siempre:
-- nombre_lead: nombre completo del cliente (sin el código 1.2.3.4 ni letras al final)
-- telefono_lead: número en formato solo dígitos sin prefijo internacional. Si ves +5492615016302 extraé 2615016302. Buscalo en campos "Celular:", "Teléfono:", números de WhatsApp, o cualquier parte del historial.
+EXTRACCIÓN DE DATOS — OBLIGATORIO:
+- nombre_lead: nombre completo sin códigos (1.2.3.4)
+- telefono_lead: solo dígitos sin prefijo internacional (de +5492615016302 extraé 2615016302)
 
 ---
 
-LECTURA OBLIGATORIA DEL HISTORIAL:
-1. Identificá fecha y contenido EXACTO del último mensaje de Juan.
-2. ¿Hubo respuesta después? Si no, ese silencio es el punto de partida.
-3. ¿Qué letras SPIN están cubiertas con datos reales?
-4. ¿Qué canal usó el lead para responder históricamente?
-5. NUNCA sugerís algo igual al último mensaje enviado.
-6. Cada referencia en mensajes debe existir en el historial real.
+LECTURA OBLIGATORIA:
+1. Último mensaje exacto de Juan y si hubo respuesta
+2. Letras SPIN cubiertas con datos reales
+3. Canal histórico de respuesta del lead
+4. NUNCA sugerís algo igual al último mensaje enviado
 
 ---
 
-DECISIÓN DE CANAL:
-LLAMADA cuando: faltan P o I, el lead respondió llamadas, caso complejo, mucho tiempo sin contacto real.
-WHATSAPP cuando: primer contacto o prefiere mensajes, objetivo es solo verificar si sigue activo, ya hay suficiente SPIN cubierto.
+CANAL:
+LLAMADA: faltan P o I, respondió llamadas antes, caso complejo, mucho tiempo sin contacto.
+WHATSAPP: prefiere mensajes, S básico, ya hay suficiente SPIN.
 
 ---
 
 TONO:
-Llamadas: primeros 30 segundos son encuadre, no venta. Preguntas conversacionales. Dar algo antes de pedir.
-WhatsApp: máximo 4 oraciones, tono humano, sin mencionar silencio, sin urgencia fabricada, detalle personal del historial, pregunta binaria al final. NUNCA usar guiones " - " para conectar frases.
+Llamadas: encuadre primero, preguntas conversacionales, dar antes de pedir.
+WhatsApp: máximo 4 oraciones, humano, sin silencio del cliente, sin urgencia fabricada, detalle personal, pregunta binaria. NUNCA guiones " - ".
 
 ---
 
@@ -71,16 +70,50 @@ BIEN: "Jose Luis, tengo los valores de marzo actualizados y quería mostrarte c�
 
 ---
 
-REGLAS DEL SCORE: cada criterio 1 a 5 MÁXIMO. Total máximo 25.
+SCORE: cada criterio 1-5 MÁXIMO. Total máximo 25.
 
 ---
 
 RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después, sin backticks):
-{"nombre_lead":"","telefono_lead":"","titulo":"","score":{"intencion":{"puntaje":0,"nota":""},"capacidad_pago":{"puntaje":0,"nota":""},"urgencia":{"puntaje":0,"nota":""},"engagement":{"puntaje":0,"nota":""},"fit_producto":{"puntaje":0,"nota":""},"total":0},"clasificacion":"","diagnostico":"","spin":{"S":{"cubierto":false,"detalle":""},"P":{"cubierto":false,"detalle":""},"I":{"cubierto":false,"detalle":""},"N":{"cubierto":false,"detalle":""},"etapa_actual":"","siguiente_letra":""},"canal":"llamada","razon_canal":"","accion":{"llamada":{"objetivo":"","apertura":"","checklist":[{"punto":"","pregunta_sugerida":"","dato_que_buscas":""}],"si_no_atiende":""},"whatsapp":{"objetivo":"","mensaje":"","si_responde":""}},"plan_b":""}
+{
+  "nombre_lead": "",
+  "telefono_lead": "",
+  "titulo": "",
+  "score": {
+    "intencion": {"puntaje": 0, "nota": ""},
+    "capacidad_pago": {"puntaje": 0, "nota": ""},
+    "urgencia": {"puntaje": 0, "nota": ""},
+    "engagement": {"puntaje": 0, "nota": ""},
+    "fit_producto": {"puntaje": 0, "nota": ""},
+    "total": 0
+  },
+  "clasificacion": "",
+  "diagnostico": "",
+  "spin": {
+    "S": {"cubierto": false, "detalle": "", "que_falta": ""},
+    "P": {"cubierto": false, "detalle": "", "que_falta": ""},
+    "I": {"cubierto": false, "detalle": "", "que_falta": ""},
+    "N": {"cubierto": false, "detalle": "", "que_falta": ""},
+    "etapa_actual": "",
+    "siguiente_letra": ""
+  },
+  "canal": "llamada",
+  "razon_canal": "",
+  "accion": {
+    "objetivo": "",
+    "apertura": "",
+    "checklist": [
+      {"punto": "", "pregunta_sugerida": "", "dato_que_buscas": ""}
+    ],
+    "si_no_atiende": "",
+    "si_responde_wp": ""
+  },
+  "plan_b": ""
+}
 
-Cuando canal es "llamada": completá accion.llamada completo y accion.whatsapp solo con si_no_atiende.
-Cuando canal es "whatsapp": completá accion.whatsapp completo.
-El checklist debe tener 4 a 6 ítems en orden SPIN empezando por la letra que falta.`;
+El checklist: 4-6 ítems en orden SPIN empezando por la letra que falta.
+Si canal es "whatsapp": accion.apertura queda vacío, accion.si_no_atiende queda vacío, completá accion.si_responde_wp.
+Si canal es "llamada": completá apertura, checklist y si_no_atiende. si_responde_wp queda vacío.`;
 
 function normalizePhone(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
@@ -102,7 +135,7 @@ async function kvGet(key) {
     const data = await res.json();
     if (data.result === null || data.result === undefined) return null;
     try { return JSON.parse(data.result); } catch { return data.result; }
-  } catch (e) { return null; }
+  } catch { return null; }
 }
 
 async function kvSet(key, value) {
@@ -116,7 +149,7 @@ async function kvSet(key, value) {
       headers: { Authorization: `Bearer ${token}` }
     });
     return res.json();
-  } catch (e) { return null; }
+  } catch { return null; }
 }
 
 export default async function handler(req, res) {
@@ -162,25 +195,57 @@ export default async function handler(req, res) {
     try { parsed = JSON.parse(clean); }
     catch (e) { return res.status(500).json({ error: 'JSON parse error', raw: rawText.substring(0, 500) }); }
 
-    // Guardar en KV
     const rawPhone = parsed.telefono_lead || '';
     const phone = rawPhone ? normalizePhone(rawPhone) : null;
 
     if (phone && phone.length >= 8) {
       const gestionId = Date.now().toString();
+
+      // Guardar análisis COMPLETO en la gestión
       const nuevaGestion = {
         id: gestionId,
         fecha: new Date().toISOString(),
+        // Score completo con notas
         score: parsed.score?.total || 0,
+        score_intencion: parsed.score?.intencion?.puntaje || 0,
+        score_intencion_nota: parsed.score?.intencion?.nota || '',
+        score_capacidad: parsed.score?.capacidad_pago?.puntaje || 0,
+        score_capacidad_nota: parsed.score?.capacidad_pago?.nota || '',
+        score_urgencia: parsed.score?.urgencia?.puntaje || 0,
+        score_urgencia_nota: parsed.score?.urgencia?.nota || '',
+        score_engagement: parsed.score?.engagement?.puntaje || 0,
+        score_engagement_nota: parsed.score?.engagement?.nota || '',
+        score_fit: parsed.score?.fit_producto?.puntaje || 0,
+        score_fit_nota: parsed.score?.fit_producto?.nota || '',
         clasificacion: parsed.clasificacion || '',
+        // Diagnóstico
+        diagnostico: parsed.diagnostico || '',
+        // SPIN completo con detalle y qué falta
         spin_s: parsed.spin?.S?.cubierto || false,
+        spin_s_detalle: parsed.spin?.S?.detalle || '',
+        spin_s_falta: parsed.spin?.S?.que_falta || '',
         spin_p: parsed.spin?.P?.cubierto || false,
+        spin_p_detalle: parsed.spin?.P?.detalle || '',
+        spin_p_falta: parsed.spin?.P?.que_falta || '',
         spin_i: parsed.spin?.I?.cubierto || false,
+        spin_i_detalle: parsed.spin?.I?.detalle || '',
+        spin_i_falta: parsed.spin?.I?.que_falta || '',
         spin_n: parsed.spin?.N?.cubierto || false,
+        spin_n_detalle: parsed.spin?.N?.detalle || '',
+        spin_n_falta: parsed.spin?.N?.que_falta || '',
         spin_etapa: parsed.spin?.etapa_actual || '',
         spin_siguiente: parsed.spin?.siguiente_letra || '',
+        // Canal
         canal: parsed.canal || '',
-        diagnostico: parsed.diagnostico || '',
+        razon_canal: parsed.razon_canal || '',
+        // Acción completa
+        accion_objetivo: parsed.accion?.objetivo || '',
+        accion_apertura: parsed.accion?.apertura || '',
+        accion_checklist: parsed.accion?.checklist || [],
+        accion_si_no_atiende: parsed.accion?.si_no_atiende || '',
+        accion_si_responde_wp: parsed.accion?.si_responde_wp || '',
+        plan_b: parsed.plan_b || '',
+        // Resultado del contacto
         resultado: null,
         notas_resultado: '',
         fecha_resultado: null
@@ -231,12 +296,11 @@ export default async function handler(req, res) {
       };
       if (idx >= 0) index[idx] = summary;
       else index.unshift(summary);
-
-      const indexResult = await kvSet('leads:index', index);
+      await kvSet('leads:index', index);
 
       parsed._gestion_id = gestionId;
       parsed._phone = phone;
-      parsed._guardado = !!(saveResult && indexResult);
+      parsed._guardado = !!(saveResult);
     } else {
       parsed._guardado = false;
       parsed._motivo = 'No se pudo extraer teléfono del historial';
