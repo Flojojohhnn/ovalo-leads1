@@ -3,306 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analizador de Leads — Ford Goldstein</title>
+<title>Analizador de Leads v2 — Ford Goldstein</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #f5f4f0;
-    color: #1a1a1a;
-    min-height: 100vh;
-    padding: 24px 16px 48px;
-  }
-
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .logo {
-    width: 40px;
-    height: 40px;
-    background: #003087;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .logo svg { width: 22px; height: 22px; }
-
-  header h1 {
-    font-size: 17px;
-    font-weight: 600;
-    color: #1a1a1a;
-    line-height: 1.2;
-  }
-
-  header p {
-    font-size: 12px;
-    color: #888;
-    margin-top: 2px;
-  }
-
-  .card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 12px;
-    border: 1px solid #e8e6e0;
-  }
-
-  label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #555;
-    display: block;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #1a1a1a; min-height: 100vh; padding: 24px 16px 48px; }
+  .container { max-width: 640px; margin: 0 auto; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .logo { width: 40px; height: 40px; background: #003087; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  header h1 { font-size: 17px; font-weight: 600; line-height: 1.2; }
+  header p { font-size: 12px; color: #888; margin-top: 2px; }
+  .card { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 12px; border: 1px solid #e8e6e0; }
+  label { font-size: 11px; font-weight: 600; color: #555; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
   label span { font-weight: 400; color: #aaa; text-transform: none; letter-spacing: 0; }
-
-  textarea {
-    width: 100%;
-    border: 1px solid #e0ddd6;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 13px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    color: #1a1a1a;
-    background: #fafaf8;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.15s;
-    line-height: 1.5;
-  }
-
+  textarea { width: 100%; border: 1px solid #e0ddd6; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'SF Mono', monospace; color: #1a1a1a; background: #fafaf8; resize: vertical; outline: none; transition: border-color 0.15s; line-height: 1.5; }
   textarea:focus { border-color: #003087; background: #fff; }
-
   #crm { min-height: 130px; }
-  #wa { min-height: 100px; }
-  #sensacion { min-height: 64px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-
+  #wa { min-height: 90px; }
+  #sensacion { min-height: 56px; font-family: -apple-system, sans-serif; }
   .field { margin-bottom: 16px; }
   .field:last-child { margin-bottom: 0; }
-
-  button.primary {
-    width: 100%;
-    padding: 14px;
-    background: #003087;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    margin-bottom: 12px;
-  }
-
+  button.primary { width: 100%; padding: 14px; background: #003087; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; margin-bottom: 12px; }
   button.primary:hover { background: #00256b; }
-  button.primary:active { transform: scale(0.99); }
   button.primary:disabled { background: #b0b8c8; cursor: not-allowed; }
-
-  #loading {
-    display: none;
-    text-align: center;
-    padding: 32px 0;
-    color: #888;
-    font-size: 14px;
-  }
-
-  .spinner {
-    width: 28px;
-    height: 28px;
-    border: 2.5px solid #e0ddd6;
-    border-top-color: #003087;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto 12px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  #errorBox {
-    display: none;
-    background: #fff2f2;
-    border: 1px solid #fcc;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 12px;
-  }
-
-  #errorBox p { font-size: 13px; color: #c00; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
-
-  #resultado { display: none; }
-
-  .lead-titulo {
-    font-size: 20px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 4px;
-  }
-
-  .score-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #f5f4f0;
-    border-radius: 8px;
-    padding: 8px 14px;
-    margin-bottom: 20px;
-  }
-
-  .score-badge .num {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a1a1a;
-  }
-
-  .score-badge .denom {
-    font-size: 14px;
-    color: #aaa;
-  }
-
-  .score-badge .cl {
-    font-size: 13px;
-    color: #555;
-    border-left: 1px solid #ddd;
-    padding-left: 10px;
-    margin-left: 2px;
-  }
-
-  .score-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .score-item {
-    background: #f5f4f0;
-    border-radius: 8px;
-    padding: 10px 10px 8px;
-    cursor: default;
-  }
-
-  .score-item .sl { font-size: 11px; color: #888; margin-bottom: 2px; }
-  .score-item .sv { font-size: 20px; font-weight: 600; color: #1a1a1a; }
-  .score-item .sv span { font-size: 11px; color: #bbb; }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #aaa;
-    margin-bottom: 8px;
-  }
-
-  .diagnostico-box {
-    background: #f5f4f0;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
-  }
-
-  .diagnostico-box p {
-    font-size: 14px;
-    line-height: 1.65;
-    color: #333;
-    white-space: pre-line;
-  }
-
-  .mensaje-box {
-    background: #fff;
-    border: 1px solid #e0ddd6;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    position: relative;
-  }
-
-  .mensaje-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  #mensajeTexto {
-    font-size: 15px;
-    line-height: 1.65;
-    color: #1a1a1a;
-  }
-
-  button.copy {
-    font-size: 12px;
-    font-weight: 500;
-    color: #003087;
-    background: #e8eef7;
-    border: none;
-    border-radius: 6px;
-    padding: 4px 12px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  button.copy:hover { background: #d0ddef; }
-
-  .planb-box {
-    border-left: 3px solid #d0ddd6;
-    padding: 10px 14px;
-    margin-bottom: 20px;
-  }
-
-  .planb-box p { font-size: 13px; color: #555; line-height: 1.55; }
-
-  button.secondary {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    color: #555;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
+  button.secondary { width: 100%; padding: 12px; background: transparent; color: #555; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; }
   button.secondary:hover { background: #f0efe9; }
-
-  .tooltip {
-    position: relative;
-  }
-  .tooltip:hover::after {
-    content: attr(data-tip);
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #222;
-    color: #fff;
-    font-size: 11px;
-    padding: 5px 8px;
-    border-radius: 6px;
-    white-space: nowrap;
-    max-width: 220px;
-    white-space: normal;
-    z-index: 10;
-    line-height: 1.4;
-  }
+  button.copy { font-size: 12px; font-weight: 500; color: #003087; background: #e8eef7; border: none; border-radius: 6px; padding: 4px 12px; cursor: pointer; }
+  button.copy:hover { background: #d0ddef; }
+  #loading { display: none; text-align: center; padding: 32px 0; color: #888; font-size: 14px; }
+  .spinner { width: 28px; height: 28px; border: 2.5px solid #e0ddd6; border-top-color: #003087; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #errorBox { display: none; background: #fff2f2; border: 1px solid #fcc; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  #errorBox p { font-size: 12px; color: #c00; white-space: pre-wrap; word-break: break-all; }
+  #resultado { display: none; }
+  .lead-titulo { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .score-badge { display: inline-flex; align-items: center; gap: 8px; background: #f5f4f0; border-radius: 8px; padding: 8px 14px; margin-bottom: 20px; }
+  .score-badge .num { font-size: 24px; font-weight: 700; }
+  .score-badge .denom { font-size: 14px; color: #aaa; }
+  .score-badge .cl { font-size: 13px; color: #555; border-left: 1px solid #ddd; padding-left: 10px; }
+  .score-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .score-item { background: #f5f4f0; border-radius: 8px; padding: 10px 10px 8px; cursor: default; position: relative; }
+  .score-item .sl { font-size: 11px; color: #888; margin-bottom: 2px; }
+  .score-item .sv { font-size: 20px; font-weight: 600; }
+  .score-item .sv span { font-size: 11px; color: #bbb; }
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; margin-bottom: 8px; }
+  .box { background: #f5f4f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+  .box p { font-size: 14px; line-height: 1.65; color: #333; white-space: pre-line; }
+  .spin-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .spin-item { border-radius: 8px; padding: 10px; text-align: center; border: 1.5px solid transparent; }
+  .spin-item.ok { background: #e8f5e9; border-color: #a5d6a7; }
+  .spin-item.falta { background: #fff8e1; border-color: #ffe082; }
+  .spin-item .sl { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+  .spin-item.ok .sl { color: #2e7d32; }
+  .spin-item.falta .sl { color: #f57f17; }
+  .spin-item .sd { font-size: 11px; color: #666; line-height: 1.3; }
+  .canal-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+  .canal-badge.llamada { background: #e3f0ff; color: #003087; }
+  .canal-badge.whatsapp { background: #e8f5e9; color: #1b5e20; }
+  .razon { font-size: 13px; color: #666; margin-bottom: 16px; font-style: italic; }
+  .checklist { list-style: none; padding: 0; margin: 0; }
+  .checklist li { border: 1px solid #e8e6e0; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; background: #fff; }
+  .checklist li .punto { font-size: 13px; font-weight: 600; color: #003087; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .checklist li .punto::before { content: ""; width: 16px; height: 16px; border: 1.5px solid #003087; border-radius: 4px; flex-shrink: 0; display: inline-block; }
+  .checklist li .pregunta { font-size: 13px; color: #1a1a1a; margin-bottom: 4px; font-style: italic; }
+  .checklist li .dato { font-size: 12px; color: #888; }
+  .mensaje-box { background: #fff; border: 1px solid #e0ddd6; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+  .mensaje-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .mensaje-texto { font-size: 14px; line-height: 1.65; color: #1a1a1a; }
+  .planb-box { border-left: 3px solid #d0ddd6; padding: 10px 14px; margin-bottom: 20px; }
+  .planb-box p { font-size: 13px; color: #555; line-height: 1.55; }
+  .divider { border: none; border-top: 1px solid #eee; margin: 16px 0; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .tag.respaldo { background: #f3e5f5; color: #6a1b9a; }
+  .tag.si-responde { background: #e0f2f1; color: #004d40; }
 </style>
 </head>
 <body>
@@ -310,14 +82,14 @@
 
   <header>
     <div class="logo">
-      <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
         <ellipse cx="11" cy="11" rx="10" ry="6.5" stroke="white" stroke-width="1.5"/>
         <path d="M4 8.5C4 8.5 7 13.5 11 13.5C15 13.5 18 8.5 18 8.5" stroke="white" stroke-width="1.5"/>
       </svg>
     </div>
     <div>
       <h1>Analizador de Leads</h1>
-      <p>Plan Óvalo — Ford Goldstein Mendoza</p>
+      <p>Plan Óvalo — Ford Goldstein Mendoza · v2.0</p>
     </div>
   </header>
 
@@ -332,17 +104,13 @@
     </div>
     <div class="field">
       <label>Tu sensación <span>(lo que el CRM no captura)</span></label>
-      <textarea id="sensacion" placeholder="Ej: creo que el tema es precio pero no lo dijo, se enfrió después de la segunda llamada..."></textarea>
+      <textarea id="sensacion" placeholder="Ej: creo que el tema es precio, se enfrió después de la segunda llamada..."></textarea>
     </div>
   </div>
 
   <button class="primary" id="analizarBtn" onclick="analizar()">Analizar lead</button>
 
-  <div id="loading">
-    <div class="spinner"></div>
-    <p>Analizando historial...</p>
-  </div>
-
+  <div id="loading"><div class="spinner"></div><p>Analizando historial...</p></div>
   <div id="errorBox"><p id="errorMsg"></p></div>
 
   <div id="resultado">
@@ -360,18 +128,24 @@
 
     <div class="card">
       <div class="section-label">Diagnóstico</div>
-      <div class="diagnostico-box"><p id="diagnosticoTexto"></p></div>
+      <div class="box" style="margin-bottom:16px"><p id="diagnosticoTexto"></p></div>
 
-      <div class="section-label">Mensaje sugerido</div>
-      <div class="mensaje-box">
-        <div class="mensaje-header">
-          <span style="font-size:12px;color:#aaa;">Listo para WhatsApp</span>
-          <button class="copy" id="copiarBtn" onclick="copiarMensaje()">Copiar</button>
-        </div>
-        <p id="mensajeTexto"></p>
+      <div class="section-label">Estado SPIN</div>
+      <div class="spin-grid" id="spinGrid"></div>
+      <div class="box" style="background:#fff3e0;margin-bottom:0">
+        <p style="font-size:13px;color:#e65100;" id="spinEtapa"></p>
       </div>
+    </div>
 
-      <div class="section-label">Plan B — si no responde en 5-7 días</div>
+    <div class="card" id="cardAccion">
+      <div class="section-label">Canal recomendado</div>
+      <div id="canalBadge"></div>
+      <p class="razon" id="razonCanal"></p>
+
+      <div id="bloqueAccion"></div>
+
+      <hr class="divider">
+      <div class="section-label">Plan B — si no hay respuesta en 5-7 días</div>
       <div class="planb-box"><p id="planBTexto"></p></div>
     </div>
 
@@ -385,7 +159,6 @@ async function analizar() {
   const crm = document.getElementById('crm').value.trim();
   const wa = document.getElementById('wa').value.trim();
   const sensacion = document.getElementById('sensacion').value.trim();
-
   if (!crm) { mostrarError('Pegá el historial del CRM para poder analizar.'); return; }
 
   document.getElementById('errorBox').style.display = 'none';
@@ -399,17 +172,10 @@ async function analizar() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ crm, wa, sensacion })
     });
-
     const data = await resp.json();
-
-    if (!resp.ok || data.error) {
-      mostrarError(JSON.stringify(data.error || data, null, 2));
-      return;
-    }
-
+    if (!resp.ok || data.error) { mostrarError(JSON.stringify(data.error || data, null, 2)); return; }
     renderResultado(data);
-
-  } catch (e) {
+  } catch(e) {
     mostrarError('Error de red: ' + e.message);
   } finally {
     document.getElementById('loading').style.display = 'none';
@@ -433,34 +199,105 @@ function renderResultado(r) {
     { key: 'engagement', label: 'Engagement' },
     { key: 'fit_producto', label: 'Fit producto' }
   ];
-
   document.getElementById('scoreGrid').innerHTML = criterios.map(c => {
     const s = r.score?.[c.key] || {};
-    return `<div class="score-item tooltip" data-tip="${(s.nota || '').replace(/"/g, '&quot;')}">
+    return `<div class="score-item" title="${(s.nota||'').replace(/"/g,'&quot;')}">
       <div class="sl">${c.label}</div>
-      <div class="sv">${s.puntaje || 0}<span>/5</span></div>
+      <div class="sv">${Math.min(s.puntaje||0,5)}<span>/5</span></div>
     </div>`;
   }).join('');
 
   document.getElementById('diagnosticoTexto').textContent = r.diagnostico || '';
-  document.getElementById('mensajeTexto').textContent = r.mensaje || '';
+
+  const spin = r.spin || {};
+  const letras = ['S','P','I','N'];
+  const nombres = { S:'Situación', P:'Problema', I:'Implicación', N:'Need-Payoff' };
+  document.getElementById('spinGrid').innerHTML = letras.map(l => {
+    const d = spin[l] || {};
+    const ok = d.cubierto === true;
+    return `<div class="spin-item ${ok ? 'ok' : 'falta'}" title="${(d.detalle||'').replace(/"/g,'&quot;')}">
+      <div class="sl">${l}</div>
+      <div class="sd">${nombres[l]}</div>
+      <div style="font-size:16px;margin-top:4px">${ok ? '✓' : '○'}</div>
+    </div>`;
+  }).join('');
+
+  const etapaTexto = spin.etapa_actual
+    ? `Etapa actual: ${spin.etapa_actual}${spin.siguiente_letra ? ' · Siguiente paso: completar ' + spin.siguiente_letra : ''}`
+    : '';
+  document.getElementById('spinEtapa').textContent = etapaTexto;
+
+  const canal = r.canal || 'llamada';
+  document.getElementById('canalBadge').innerHTML = `<div class="canal-badge ${canal}">${canal === 'llamada' ? '📞 Llamada telefónica' : '💬 WhatsApp'}</div>`;
+  document.getElementById('razonCanal').textContent = r.razon_canal || '';
+
+  const accion = r.accion || {};
+  let html = '';
+
+  if (canal === 'llamada') {
+    const ll = accion.llamada || {};
+    if (ll.objetivo) html += `<div class="section-label" style="margin-bottom:6px">Objetivo de la llamada</div><div class="box" style="margin-bottom:16px"><p>${ll.objetivo}</p></div>`;
+    if (ll.apertura) html += `<div class="section-label" style="margin-bottom:6px">Apertura sugerida — primeros 30 segundos</div><div class="box" style="margin-bottom:16px"><p>${ll.apertura}</p></div>`;
+    if (ll.checklist && ll.checklist.length) {
+      html += `<div class="section-label" style="margin-bottom:8px">Checklist de indagación</div><ul class="checklist">`;
+      ll.checklist.forEach(item => {
+        html += `<li>
+          <div class="punto">${item.punto || ''}</div>
+          <div class="pregunta">"${item.pregunta_sugerida || ''}"</div>
+          <div class="dato">Buscás saber: ${item.dato_que_buscas || ''}</div>
+        </li>`;
+      });
+      html += `</ul>`;
+    }
+    if (ll.si_no_atiende) {
+      html += `<div style="margin-top:16px">
+        <span class="tag respaldo">Si no atiende — WhatsApp de respaldo</span>
+        <div class="mensaje-box">
+          <div class="mensaje-header">
+            <span style="font-size:12px;color:#aaa">Listo para copiar</span>
+            <button class="copy" onclick="copiar('respaldo')">Copiar</button>
+          </div>
+          <p class="mensaje-texto" id="textoRespaldo">${ll.si_no_atiende}</p>
+        </div>
+      </div>`;
+    }
+  } else {
+    const wp = accion.whatsapp || {};
+    if (wp.objetivo) html += `<div class="section-label" style="margin-bottom:6px">Objetivo del mensaje</div><div class="box" style="margin-bottom:16px"><p>${wp.objetivo}</p></div>`;
+    if (wp.mensaje) {
+      html += `<div class="section-label" style="margin-bottom:6px">Mensaje sugerido</div>
+      <div class="mensaje-box">
+        <div class="mensaje-header">
+          <span style="font-size:12px;color:#aaa">Listo para WhatsApp</span>
+          <button class="copy" onclick="copiar('mensaje')">Copiar</button>
+        </div>
+        <p class="mensaje-texto" id="textoMensaje">${wp.mensaje}</p>
+      </div>`;
+    }
+    if (wp.si_responde) {
+      html += `<div><span class="tag si-responde">Si responde</span><div class="box"><p>${wp.si_responde}</p></div></div>`;
+    }
+  }
+
+  document.getElementById('bloqueAccion').innerHTML = html;
   document.getElementById('planBTexto').textContent = r.plan_b || '';
 
   document.getElementById('resultado').style.display = 'block';
   document.getElementById('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function copiarMensaje() {
-  const msg = document.getElementById('mensajeTexto').textContent;
-  navigator.clipboard.writeText(msg).then(() => {
-    const btn = document.getElementById('copiarBtn');
-    btn.textContent = '¡Copiado!';
-    setTimeout(() => btn.textContent = 'Copiar', 2000);
+function copiar(tipo) {
+  const id = tipo === 'respaldo' ? 'textoRespaldo' : 'textoMensaje';
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btns = document.querySelectorAll('button.copy');
+    btns.forEach(b => { if (b.getAttribute('onclick').includes(tipo)) { b.textContent = '¡Copiado!'; setTimeout(() => b.textContent = 'Copiar', 2000); } });
   });
 }
 
 function resetear() {
-  ['crm', 'wa', 'sensacion'].forEach(id => document.getElementById(id).value = '');
+  ['crm','wa','sensacion'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('resultado').style.display = 'none';
   document.getElementById('errorBox').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
