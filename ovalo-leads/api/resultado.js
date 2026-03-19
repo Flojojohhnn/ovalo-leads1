@@ -1,8 +1,3 @@
-// POST /api/resultado — registra el resultado de un contacto
-
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
-
 function normalizePhone(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
   if (digits.length === 13 && digits.startsWith('549')) return digits.slice(3);
@@ -13,27 +8,28 @@ function normalizePhone(raw) {
 }
 
 async function kvGet(key) {
-  if (!KV_URL || !KV_TOKEN) return null;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
   try {
-    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` }
+    const res = await fetch(`${url}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
-    if (!data.result) return null;
+    if (data.result === null || data.result === undefined) return null;
     try { return JSON.parse(data.result); } catch { return data.result; }
   } catch { return null; }
 }
 
 async function kvSet(key, value) {
-  if (!KV_URL || !KV_TOKEN) return null;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
   try {
-    const res = await fetch(`${KV_URL}/set`, {
+    const encoded = encodeURIComponent(JSON.stringify(value));
+    const res = await fetch(`${url}/set/${encodeURIComponent(key)}/${encoded}`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${KV_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([key, JSON.stringify(value)])
+      headers: { Authorization: `Bearer ${token}` }
     });
     return res.json();
   } catch { return null; }
@@ -53,9 +49,8 @@ export default async function handler(req, res) {
   const lead = await kvGet(`lead:${id}`);
   if (!lead) return res.status(404).json({ error: 'Lead no encontrado.' });
 
-  // Actualizar última gestión o la gestión específica
   const gestions = lead.gestiones || [];
-  let target = gestion_id
+  const target = gestion_id
     ? gestions.find(g => g.id === gestion_id)
     : gestions[gestions.length - 1];
 
@@ -68,7 +63,6 @@ export default async function handler(req, res) {
   lead.ultimo_resultado = resultado;
   await kvSet(`lead:${id}`, lead);
 
-  // Actualizar índice
   let index = await kvGet('leads:index') || [];
   const idx = index.findIndex(l => l.id === id);
   if (idx >= 0) {

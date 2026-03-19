@@ -25,20 +25,19 @@ El código en el nombre del contacto (1.2.3.4) indica por qué pasos pasó. Usal
 
 FRAMEWORK SPIN — LÓGICA CENTRAL:
 Antes de sugerir cualquier acción, evaluá qué letras están cubiertas con información REAL del historial:
-
 S — SITUACIÓN: ¿sabemos qué vehículo tiene, para qué lo usa, hace cuánto, si tiene algo para entregar?
 P — PROBLEMA: ¿sabemos qué le molesta de su situación actual, por qué mira opciones?
 I — IMPLICACIÓN: ¿el cliente dimensionó el costo de no actuar, qué pierde si espera?
 N — NEED-PAYOFF: ¿el cliente verbalizó con sus propias palabras qué solución necesita?
 
-REGLA CRÍTICA: La visita se propone SOLO cuando hay N. Antes de N, el siguiente paso siempre es completar la letra que falta. Proponer visita antes de N quema el lead.
+REGLA CRÍTICA: La visita se propone SOLO cuando hay N. Antes de N, el siguiente paso siempre es completar la letra que falta.
 
 ---
 
 EXTRACCIÓN DE DATOS DEL LEAD — OBLIGATORIO:
 Del historial que recibís, extraé siempre:
 - nombre_lead: nombre completo del cliente (sin el código 1.2.3.4 ni letras al final)
-- telefono_lead: número de teléfono en formato solo dígitos sin el prefijo internacional (ej: si ves +5492615016302 o 5492615016302, extraé 2615016302). Buscalo en campos como "Celular:", "Teléfono:", en números de WhatsApp, o en cualquier parte del historial.
+- telefono_lead: número en formato solo dígitos sin prefijo internacional. Si ves +5492615016302 extraé 2615016302. Buscalo en campos "Celular:", "Teléfono:", números de WhatsApp, o cualquier parte del historial.
 
 ---
 
@@ -54,13 +53,13 @@ LECTURA OBLIGATORIA DEL HISTORIAL:
 
 DECISIÓN DE CANAL:
 LLAMADA cuando: faltan P o I, el lead respondió llamadas, caso complejo, mucho tiempo sin contacto real.
-WHATSAPP cuando: primer contacto o prefiere mensajes, objetivo es solo verificar si sigue activo (S básico), ya hay suficiente SPIN y falta dar el siguiente paso.
+WHATSAPP cuando: primer contacto o prefiere mensajes, objetivo es solo verificar si sigue activo, ya hay suficiente SPIN cubierto.
 
 ---
 
-TONO — CRÍTICO:
-Llamadas: los primeros 30 segundos son encuadre, no venta. El cliente entiende POR QUÉ le preguntás antes de que le preguntes. Preguntas conversacionales: "contame cómo viene el tema del auto" no "¿para qué usás el auto?". Dar algo antes de pedir.
-WhatsApp: máximo 4 oraciones, tono humano, sin mencionar silencio del cliente, sin urgencia fabricada, con detalle personal del historial, pregunta binaria al final. NUNCA usar guiones " - " para conectar frases, usar punto o coma.
+TONO:
+Llamadas: primeros 30 segundos son encuadre, no venta. Preguntas conversacionales. Dar algo antes de pedir.
+WhatsApp: máximo 4 oraciones, tono humano, sin mencionar silencio, sin urgencia fabricada, detalle personal del historial, pregunta binaria al final. NUNCA usar guiones " - " para conectar frases.
 
 ---
 
@@ -76,15 +75,12 @@ REGLAS DEL SCORE: cada criterio 1 a 5 MÁXIMO. Total máximo 25.
 
 ---
 
-RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después, sin backticks, sin markdown):
+RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después, sin backticks):
 {"nombre_lead":"","telefono_lead":"","titulo":"","score":{"intencion":{"puntaje":0,"nota":""},"capacidad_pago":{"puntaje":0,"nota":""},"urgencia":{"puntaje":0,"nota":""},"engagement":{"puntaje":0,"nota":""},"fit_producto":{"puntaje":0,"nota":""},"total":0},"clasificacion":"","diagnostico":"","spin":{"S":{"cubierto":false,"detalle":""},"P":{"cubierto":false,"detalle":""},"I":{"cubierto":false,"detalle":""},"N":{"cubierto":false,"detalle":""},"etapa_actual":"","siguiente_letra":""},"canal":"llamada","razon_canal":"","accion":{"llamada":{"objetivo":"","apertura":"","checklist":[{"punto":"","pregunta_sugerida":"","dato_que_buscas":""}],"si_no_atiende":""},"whatsapp":{"objetivo":"","mensaje":"","si_responde":""}},"plan_b":""}
 
 Cuando canal es "llamada": completá accion.llamada completo y accion.whatsapp solo con si_no_atiende.
 Cuando canal es "whatsapp": completá accion.whatsapp completo.
 El checklist debe tener 4 a 6 ítems en orden SPIN empezando por la letra que falta.`;
-
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
 
 function normalizePhone(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
@@ -96,30 +92,31 @@ function normalizePhone(raw) {
 }
 
 async function kvGet(key) {
-  if (!KV_URL || !KV_TOKEN) return null;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
   try {
-    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` }
+    const res = await fetch(`${url}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
-    if (!data.result) return null;
+    if (data.result === null || data.result === undefined) return null;
     try { return JSON.parse(data.result); } catch { return data.result; }
-  } catch { return null; }
+  } catch (e) { return null; }
 }
 
 async function kvSet(key, value) {
-  if (!KV_URL || !KV_TOKEN) return null;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
   try {
-    const res = await fetch(`${KV_URL}/set`, {
+    const encoded = encodeURIComponent(JSON.stringify(value));
+    const res = await fetch(`${url}/set/${encodeURIComponent(key)}/${encoded}`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${KV_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([key, JSON.stringify(value)])
+      headers: { Authorization: `Bearer ${token}` }
     });
     return res.json();
-  } catch { return null; }
+  } catch (e) { return null; }
 }
 
 export default async function handler(req, res) {
@@ -165,7 +162,7 @@ export default async function handler(req, res) {
     try { parsed = JSON.parse(clean); }
     catch (e) { return res.status(500).json({ error: 'JSON parse error', raw: rawText.substring(0, 500) }); }
 
-    // Guardar en KV usando el teléfono extraído del historial
+    // Guardar en KV
     const rawPhone = parsed.telefono_lead || '';
     const phone = rawPhone ? normalizePhone(rawPhone) : null;
 
@@ -189,10 +186,10 @@ export default async function handler(req, res) {
         fecha_resultado: null
       };
 
-      let lead = await kvGet(`lead:${phone}`);
       const nombreFinal = parsed.nombre_lead || parsed.titulo?.split('—')[0]?.trim() || 'Sin nombre';
       const modeloFinal = parsed.titulo?.split('—')[1]?.trim() || '';
 
+      let lead = await kvGet(`lead:${phone}`);
       if (!lead) {
         lead = {
           id: phone,
@@ -203,8 +200,8 @@ export default async function handler(req, res) {
           gestiones: []
         };
       } else {
-        if (modeloFinal) lead.modelo = modeloFinal;
         lead.nombre = nombreFinal;
+        if (modeloFinal) lead.modelo = modeloFinal;
       }
 
       lead.gestiones.push(nuevaGestion);
@@ -212,7 +209,7 @@ export default async function handler(req, res) {
       lead.ultimo_score = parsed.score?.total || 0;
       lead.ultima_gestion_id = gestionId;
 
-      await kvSet(`lead:${phone}`, lead);
+      const saveResult = await kvSet(`lead:${phone}`, lead);
 
       // Actualizar índice
       let index = await kvGet('leads:index') || [];
@@ -222,23 +219,24 @@ export default async function handler(req, res) {
         nombre: lead.nombre,
         modelo: lead.modelo,
         score: lead.ultimo_score,
-        spin_siguiente: nuevaGestion.spin_siguiente,
-        spin_etapa: nuevaGestion.spin_etapa,
         spin_s: nuevaGestion.spin_s,
         spin_p: nuevaGestion.spin_p,
         spin_i: nuevaGestion.spin_i,
         spin_n: nuevaGestion.spin_n,
+        spin_siguiente: nuevaGestion.spin_siguiente,
+        spin_etapa: nuevaGestion.spin_etapa,
         ultima_gestion: new Date().toISOString().split('T')[0],
         ultimo_resultado: lead.ultimo_resultado || null,
         total_gestiones: lead.gestiones.length
       };
       if (idx >= 0) index[idx] = summary;
       else index.unshift(summary);
-      await kvSet('leads:index', index);
+
+      const indexResult = await kvSet('leads:index', index);
 
       parsed._gestion_id = gestionId;
       parsed._phone = phone;
-      parsed._guardado = true;
+      parsed._guardado = !!(saveResult && indexResult);
     } else {
       parsed._guardado = false;
       parsed._motivo = 'No se pudo extraer teléfono del historial';

@@ -1,16 +1,13 @@
-// GET /api/leads — devuelve el índice de todos los leads
-
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
-
 async function kvGet(key) {
-  if (!KV_URL || !KV_TOKEN) return null;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  if (!url || !token) return null;
   try {
-    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` }
+    const res = await fetch(`${url}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
-    if (!data.result) return null;
+    if (data.result === null || data.result === undefined) return null;
     try { return JSON.parse(data.result); } catch { return data.result; }
   } catch { return null; }
 }
