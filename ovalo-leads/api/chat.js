@@ -12,35 +12,40 @@ GRILLA VIGENTE MARZO 2026:
 
 SPIN: S=Situación P=Problema I=Implicación N=Need-Payoff
 La visita se propone SOLO cuando hay N cubierto.
+Cuando Juan aporta info nueva que completa una letra SPIN, marcala como cubierta y describí qué información la cubre en "detalle".
 
 TONO: Conversacional, directo, colega de ventas. Español rioplatense.
-Si Juan aporta info nueva, actualizá tu lectura.
-Si te pide próxima acción, dala concreta.
-Si te pide mensaje WP o guión de llamada, generalo listo para usar.
 NUNCA usar guiones " - " en mensajes de WhatsApp sugeridos.
 
-FORMATO DE RESPUESTA — MUY IMPORTANTE:
-Respondé SIEMPRE con este JSON (sin backticks, sin texto antes ni después):
+FORMATO DE RESPUESTA — OBLIGATORIO, sin backticks, sin texto antes ni después:
 {
   "respuesta": "tu respuesta conversacional acá",
-  "actualizar_perfil": true o false,
+  "actualizar_perfil": false,
   "perfil": {
-    "diagnostico": "diagnóstico actualizado si cambió, sino null",
-    "spin_s": true o false o null,
-    "spin_p": true o false o null,
-    "spin_i": true o false o null,
-    "spin_n": true o false o null,
-    "spin_etapa": "descripción de etapa actual o null",
-    "spin_siguiente": "letra a completar o null",
-    "canal": "llamada o whatsapp o null",
-    "razon_canal": "razón del canal o null",
-    "score_ajuste": número entre -5 y +5 o null,
-    "modelo": "modelo actualizado si se confirmó o null"
+    "diagnostico": null,
+    "spin_s": null, "spin_s_detalle": null, "spin_s_falta": null,
+    "spin_p": null, "spin_p_detalle": null, "spin_p_falta": null,
+    "spin_i": null, "spin_i_detalle": null, "spin_i_falta": null,
+    "spin_n": null, "spin_n_detalle": null, "spin_n_falta": null,
+    "spin_etapa": null,
+    "spin_siguiente": null,
+    "canal": null,
+    "razon_canal": null,
+    "score_ajuste": null,
+    "modelo": null,
+    "accion_objetivo": null,
+    "accion_apertura": null,
+    "accion_checklist": null,
+    "accion_si_no_atiende": null,
+    "plan_b": null
   }
 }
 
-Solo ponés actualizar_perfil: true cuando Juan aportó información nueva que realmente cambia el análisis.
-Si no hay nada que actualizar, ponés actualizar_perfil: false y todos los campos de perfil en null.`;
+Reglas:
+- actualizar_perfil: true SOLO cuando Juan aporta info nueva que realmente cambia el análisis
+- Si una letra SPIN pasa a cubierta, incluí su detalle (qué info la cubre) y ponéle que_falta en vacío
+- Si una letra sigue sin cubrir pero sabés mejor qué falta, actualizá su que_falta
+- Todos los campos de perfil que no cambian van en null`;
 
 function normalizePhone(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
@@ -97,16 +102,22 @@ export default async function handler(req, res) {
   if (!lead) return res.status(404).json({ error: 'Lead no encontrado.' });
 
   const g = lead.gestiones?.[lead.gestiones.length - 1] || {};
+
   const analisisContexto = `
 ANÁLISIS ACTUAL DEL LEAD:
-Nombre: ${lead.nombre}
-Modelo: ${lead.modelo || 'No definido'}
+Nombre: ${lead.nombre} | Modelo: ${lead.modelo || 'No definido'}
 Score: ${lead.ultimo_score}/25 — ${g.clasificacion || ''}
-Diagnóstico: ${g.diagnostico || 'Sin diagnóstico'}
-SPIN: S=${g.spin_s ? 'SÍ' : 'NO'} P=${g.spin_p ? 'SÍ' : 'NO'} I=${g.spin_i ? 'SÍ' : 'NO'} N=${g.spin_n ? 'SÍ' : 'NO'}
-Etapa: ${g.spin_etapa || '—'} | Siguiente: ${g.spin_siguiente || '—'}
-Canal recomendado: ${g.canal || '—'}
-Acción sugerida: ${g.accion_objetivo || '—'}
+Diagnóstico: ${g.diagnostico || '—'}
+
+SPIN ACTUAL:
+S (Situación): ${g.spin_s ? 'CUBIERTO — ' + (g.spin_s_detalle || '') : 'FALTA — ' + (g.spin_s_falta || 'sin info')}
+P (Problema): ${g.spin_p ? 'CUBIERTO — ' + (g.spin_p_detalle || '') : 'FALTA — ' + (g.spin_p_falta || 'sin info')}
+I (Implicación): ${g.spin_i ? 'CUBIERTO — ' + (g.spin_i_detalle || '') : 'FALTA — ' + (g.spin_i_falta || 'sin info')}
+N (Need-Payoff): ${g.spin_n ? 'CUBIERTO — ' + (g.spin_n_detalle || '') : 'FALTA — ' + (g.spin_n_falta || 'sin info')}
+Etapa: ${g.spin_etapa || '—'} | Siguiente a completar: ${g.spin_siguiente || '—'}
+
+Canal recomendado: ${g.canal || '—'} — ${g.razon_canal || ''}
+Última acción sugerida: ${g.accion_objetivo || '—'}
 Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.split('T')[0]}: ${gg.resultado}${gg.notas_resultado ? ' ('+gg.notas_resultado+')' : ''}` : null).filter(Boolean).join(' | ') || 'Ninguno'}`;
 
   const systemPrompt = CHAT_SYSTEM + '\n\n' + analisisContexto;
@@ -146,70 +157,86 @@ Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.s
     const respuesta = parsed.respuesta || rawText;
     const ahora = new Date().toISOString();
 
-    // Guardar chat
     chatHistory.push({ role: 'user', content: mensaje, fecha: ahora });
     chatHistory.push({ role: 'assistant', content: respuesta, fecha: ahora });
     lead.chat_history = chatHistory.slice(-40);
     lead.ultimo_chat = ahora;
 
-    // Aplicar actualizaciones de perfil si corresponde
-    let perfilActualizado = null;
+    let leadActualizado = null;
+
     if (parsed.actualizar_perfil && parsed.perfil) {
       const p = parsed.perfil;
-      const ultimaGestion = lead.gestiones[lead.gestiones.length - 1];
-      if (ultimaGestion) {
-        if (p.diagnostico !== null && p.diagnostico !== undefined) ultimaGestion.diagnostico = p.diagnostico;
-        if (p.spin_s !== null && p.spin_s !== undefined) ultimaGestion.spin_s = p.spin_s;
-        if (p.spin_p !== null && p.spin_p !== undefined) ultimaGestion.spin_p = p.spin_p;
-        if (p.spin_i !== null && p.spin_i !== undefined) ultimaGestion.spin_i = p.spin_i;
-        if (p.spin_n !== null && p.spin_n !== undefined) ultimaGestion.spin_n = p.spin_n;
-        if (p.spin_etapa !== null && p.spin_etapa !== undefined) ultimaGestion.spin_etapa = p.spin_etapa;
-        if (p.spin_siguiente !== null && p.spin_siguiente !== undefined) ultimaGestion.spin_siguiente = p.spin_siguiente;
-        if (p.canal !== null && p.canal !== undefined) ultimaGestion.canal = p.canal;
-        if (p.razon_canal !== null && p.razon_canal !== undefined) ultimaGestion.razon_canal = p.razon_canal;
+      const ug = lead.gestiones[lead.gestiones.length - 1];
+      if (ug) {
+        const campos = [
+          'diagnostico','spin_s','spin_s_detalle','spin_s_falta',
+          'spin_p','spin_p_detalle','spin_p_falta',
+          'spin_i','spin_i_detalle','spin_i_falta',
+          'spin_n','spin_n_detalle','spin_n_falta',
+          'spin_etapa','spin_siguiente','canal','razon_canal',
+          'accion_objetivo','accion_apertura','accion_checklist',
+          'accion_si_no_atiende','plan_b'
+        ];
+        campos.forEach(campo => {
+          if (p[campo] !== null && p[campo] !== undefined) ug[campo] = p[campo];
+        });
         if (p.score_ajuste !== null && p.score_ajuste !== undefined) {
           lead.ultimo_score = Math.max(0, Math.min(25, (lead.ultimo_score || 0) + p.score_ajuste));
         }
         if (p.modelo !== null && p.modelo !== undefined) lead.modelo = p.modelo;
       }
-      perfilActualizado = parsed.perfil;
-    }
 
-    await kvSet(`lead:${id}`, lead);
-
-    // Actualizar índice si cambió el score
-    if (parsed.actualizar_perfil && parsed.perfil?.score_ajuste) {
-      let index = await kvGet('leads:index') || [];
-      const idx = index.findIndex(l => l.id === id);
-      if (idx >= 0) {
-        index[idx].score = lead.ultimo_score;
-        const g2 = lead.gestiones[lead.gestiones.length - 1];
-        if (g2) {
-          index[idx].spin_s = g2.spin_s;
-          index[idx].spin_p = g2.spin_p;
-          index[idx].spin_i = g2.spin_i;
-          index[idx].spin_n = g2.spin_n;
+      // Actualizar índice si cambia score
+      if (p.score_ajuste) {
+        let index = await kvGet('leads:index') || [];
+        const idx = index.findIndex(l => l.id === id);
+        if (idx >= 0) {
+          const ug2 = lead.gestiones[lead.gestiones.length - 1];
+          index[idx].score = lead.ultimo_score;
+          index[idx].spin_s = ug2.spin_s;
+          index[idx].spin_p = ug2.spin_p;
+          index[idx].spin_i = ug2.spin_i;
+          index[idx].spin_n = ug2.spin_n;
+          index[idx].spin_siguiente = ug2.spin_siguiente;
+          await kvSet('leads:index', index);
         }
-        await kvSet('leads:index', index);
       }
-    }
 
-    return res.status(200).json({
-      respuesta,
-      fecha: ahora,
-      perfil_actualizado: !!perfilActualizado,
-      lead_actualizado: parsed.actualizar_perfil ? {
+      leadActualizado = {
         score: lead.ultimo_score,
         modelo: lead.modelo,
         diagnostico: lead.gestiones[lead.gestiones.length-1]?.diagnostico,
         spin_s: lead.gestiones[lead.gestiones.length-1]?.spin_s,
+        spin_s_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_s_detalle,
+        spin_s_falta: lead.gestiones[lead.gestiones.length-1]?.spin_s_falta,
         spin_p: lead.gestiones[lead.gestiones.length-1]?.spin_p,
+        spin_p_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_p_detalle,
+        spin_p_falta: lead.gestiones[lead.gestiones.length-1]?.spin_p_falta,
         spin_i: lead.gestiones[lead.gestiones.length-1]?.spin_i,
+        spin_i_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_i_detalle,
+        spin_i_falta: lead.gestiones[lead.gestiones.length-1]?.spin_i_falta,
         spin_n: lead.gestiones[lead.gestiones.length-1]?.spin_n,
+        spin_n_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_n_detalle,
+        spin_n_falta: lead.gestiones[lead.gestiones.length-1]?.spin_n_falta,
         spin_etapa: lead.gestiones[lead.gestiones.length-1]?.spin_etapa,
         spin_siguiente: lead.gestiones[lead.gestiones.length-1]?.spin_siguiente,
         canal: lead.gestiones[lead.gestiones.length-1]?.canal,
-      } : null
+        razon_canal: lead.gestiones[lead.gestiones.length-1]?.razon_canal,
+        accion_objetivo: lead.gestiones[lead.gestiones.length-1]?.accion_objetivo,
+        accion_apertura: lead.gestiones[lead.gestiones.length-1]?.accion_apertura,
+        accion_checklist: lead.gestiones[lead.gestiones.length-1]?.accion_checklist,
+        accion_si_no_atiende: lead.gestiones[lead.gestiones.length-1]?.accion_si_no_atiende,
+        plan_b: lead.gestiones[lead.gestiones.length-1]?.plan_b,
+      };
+    }
+
+    await kvSet(`lead:${id}`, lead);
+
+    return res.status(200).json({
+      respuesta,
+      fecha: ahora,
+      perfil_actualizado: !!leadActualizado,
+      lead_actualizado: leadActualizado
     });
 
   } catch (e) {

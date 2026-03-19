@@ -9,119 +9,137 @@
 html, body { height: 100%; overflow: hidden; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0efeb; color: #1a1a1a; display: flex; flex-direction: column; }
 
-/* NAV */
 .nav { background: #003087; display: flex; align-items: center; padding: 0 20px; height: 50px; flex-shrink: 0; gap: 14px; }
 .nav-back { color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; text-decoration: none; white-space: nowrap; }
 .nav-back:hover { color: #fff; }
-.nav-title { color: #fff; font-size: 15px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.nav-badge { display: flex; align-items: baseline; gap: 3px; }
-.nav-badge .n { color: #fff; font-size: 22px; font-weight: 800; }
-.nav-badge .d { color: rgba(255,255,255,0.45); font-size: 12px; }
-.nav-cl { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 5px; }
+.nav-title { color: #fff; font-size: 15px; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.nav-score { display: flex; align-items: baseline; gap: 3px; }
+.nav-score .n { color: #fff; font-size: 22px; font-weight: 800; }
+.nav-score .d { color: rgba(255,255,255,0.4); font-size: 12px; }
+.nav-cl { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 5px; }
 
-/* MAIN */
 .main { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; min-height: 0; }
 
-/* PANEL ESQUERDO — scrollable */
-.panel { overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid #e4e2dc; background: #fafaf8; }
+/* PANEL IZQUIERDO */
+.panel { overflow-y: auto; background: #fafaf8; border-right: 1px solid #e4e2dc; }
 
-.avatar-row { display: flex; align-items: center; gap: 12px; }
-.avatar { width: 48px; height: 48px; border-radius: 50%; background: #003087; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff; flex-shrink: 0; }
-.lead-nombre { font-size: 16px; font-weight: 700; }
+/* SECCIÓN COLAPSABLE */
+.sec { border-bottom: 1px solid #eee; }
+.sec-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; background: #fafaf8; transition: background 0.12s; }
+.sec-header:hover { background: #f0efeb; }
+.sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #aaa; }
+.sec-chevron { font-size: 11px; color: #ccc; transition: transform 0.2s; }
+.sec-chevron.open { transform: rotate(180deg); }
+.sec-body { padding: 0 16px 14px; display: none; }
+.sec-body.open { display: block; }
+
+/* LEAD HEADER — siempre visible */
+.lead-header { padding: 16px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 12px; background: #fff; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: #003087; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.lead-nombre { font-size: 15px; font-weight: 700; }
 .lead-modelo { font-size: 12px; color: #888; margin-top: 2px; }
 
-/* SCORE CARD */
-.score-card { background: #fff; border-radius: 12px; border: 1px solid #e4e2dc; padding: 14px; }
+/* SCORE */
 .score-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
-.score-num { font-size: 42px; font-weight: 900; line-height: 1; }
-.score-hot { color: #e53935; }
-.score-warm { color: #f57f17; }
-.score-cold { color: #1565c0; }
-.score-dead { color: #9e9e9e; }
-.score-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
+.score-num { font-size: 44px; font-weight: 900; line-height: 1; }
+.score-hot { color: #e53935; } .score-warm { color: #f57f17; } .score-cold { color: #1565c0; } .score-dead { color: #9e9e9e; }
+.score-sub { font-size: 10px; color: #aaa; margin-top: 4px; }
 .cl-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
-.score-bars { display: flex; flex-direction: column; gap: 7px; }
-.bar-row { display: grid; grid-template-columns: 90px 1fr 22px; align-items: center; gap: 8px; }
+.bar-row { display: grid; grid-template-columns: 85px 1fr 28px; align-items: center; gap: 8px; margin-bottom: 7px; }
 .bar-label { font-size: 11px; color: #777; text-align: right; }
 .bar-track { height: 7px; background: #eee; border-radius: 4px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-.bar-val { font-size: 11px; color: #999; text-align: center; }
-.b0 { background: #5c6bc0; }
-.b1 { background: #26a69a; }
-.b2 { background: #ef5350; }
-.b3 { background: #ab47bc; }
-.b4 { background: #66bb6a; }
-
-/* SECCIONES */
-.section { background: #fff; border-radius: 12px; border: 1px solid #e4e2dc; padding: 14px; }
-.sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #bbb; margin-bottom: 10px; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+.b0{background:#5c6bc0} .b1{background:#26a69a} .b2{background:#ef5350} .b3{background:#ab47bc} .b4{background:#66bb6a}
+.bar-val { font-size: 11px; color: #aaa; text-align: center; }
+.bar-nota { font-size: 11px; color: #999; margin-top: 2px; padding-left: 95px; font-style: italic; margin-bottom: 6px; }
 
 /* SPIN */
-.spin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
-.spin-card { border-radius: 8px; padding: 10px 4px; text-align: center; border: 1.5px solid transparent; transition: all 0.3s; }
+.spin-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+.spin-card { border-radius: 8px; padding: 10px 5px; text-align: center; border: 1.5px solid transparent; cursor: default; }
 .spin-card.ok { background: #e8f5e9; border-color: #a5d6a7; }
 .spin-card.falta { background: #fff8e1; border-color: #ffe082; }
 .spin-card.next { background: #fff3e0; border-color: #ffb74d; }
-.spin-letter { font-size: 17px; font-weight: 800; }
+.spin-letter { font-size: 18px; font-weight: 800; }
 .spin-card.ok .spin-letter { color: #2e7d32; }
 .spin-card.falta .spin-letter { color: #f57f17; }
 .spin-card.next .spin-letter { color: #e65100; }
-.spin-name { font-size: 9px; color: #888; margin-top: 1px; }
-.spin-icon { font-size: 13px; margin-top: 2px; }
-.etapa-box { background: #fff3e0; border-radius: 7px; padding: 8px 11px; font-size: 12px; color: #e65100; line-height: 1.4; }
+.spin-sname { font-size: 9px; color: #999; margin-top: 1px; }
+.spin-icon { font-size: 13px; margin-top: 3px; }
+.etapa-chip { background: #fff3e0; border-radius: 7px; padding: 8px 11px; font-size: 12px; color: #e65100; line-height: 1.4; margin-bottom: 10px; }
+.spin-detail { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.spin-detail-item { border-radius: 8px; padding: 9px 11px; }
+.spin-detail-item.ok { background: #f1f8e9; border: 1px solid #c8e6c9; }
+.spin-detail-item.falta { background: #fffde7; border: 1px solid #fff9c4; }
+.spin-detail-item.next { background: #fff8e1; border: 1px solid #ffe082; }
+.sdi-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.sdi-letter { font-size: 13px; font-weight: 800; }
+.sdi-ok .sdi-letter { color: #2e7d32; }
+.sdi-falta .sdi-letter { color: #f57f17; }
+.sdi-badge { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+.sdi-ok .sdi-badge { background: #c8e6c9; color: #1b5e20; }
+.sdi-falta .sdi-badge { background: #fff9c4; color: #f57f17; }
+.sdi-text { font-size: 12px; color: #555; line-height: 1.4; }
+.sdi-falta .sdi-text { color: #e65100; }
 
 /* DIAGNÓSTICO */
 .diag-text { font-size: 13px; color: #444; line-height: 1.6; white-space: pre-line; }
-.updated-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 4px; margin-bottom: 6px; }
+.updated-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 4px; margin-bottom: 7px; }
 
 /* CANAL */
-.canal-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.canal-chip { display: inline-flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
 .canal-llamada { background: #e3f0ff; color: #003087; }
 .canal-wp { background: #e8f5e9; color: #1b5e20; }
-.canal-razon { font-size: 12px; color: #888; margin-top: 6px; font-style: italic; }
+.canal-razon { font-size: 12px; color: #888; font-style: italic; }
+
+/* ACCIÓN */
+.accion-box { background: #f8f7f3; border-radius: 8px; padding: 11px 13px; margin-bottom: 10px; font-size: 13px; color: #333; line-height: 1.5; }
+.accion-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #bbb; margin-bottom: 5px; }
+.apertura-box { background: #e8eef7; border-radius: 8px; padding: 11px 13px; font-size: 13px; color: #1a3a6b; line-height: 1.6; margin-bottom: 10px; }
+.checklist { list-style: none; }
+.cl-item { border: 1px solid #e4e2dc; border-radius: 9px; padding: 10px 12px; margin-bottom: 7px; background: #fff; }
+.cl-punto { font-size: 12px; font-weight: 600; color: #003087; margin-bottom: 4px; display: flex; align-items: flex-start; gap: 7px; }
+.cl-punto::before { content: ""; min-width: 14px; height: 14px; border: 1.5px solid #003087; border-radius: 3px; display: inline-block; margin-top: 1px; flex-shrink: 0; }
+.cl-pregunta { font-size: 12px; color: #333; font-style: italic; margin-bottom: 3px; padding-left: 21px; }
+.cl-dato { font-size: 11px; color: #aaa; padding-left: 21px; }
+.msg-copy-box { background: #fff; border: 1px solid #e4e2dc; border-radius: 9px; padding: 11px 13px; }
+.msg-copy-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.msg-copy-label { font-size: 10px; color: #bbb; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.btn-copy { font-size: 11px; font-weight: 500; color: #003087; background: #e8eef7; border: none; border-radius: 5px; padding: 3px 10px; cursor: pointer; }
+.btn-copy:hover { background: #d0ddef; }
+.msg-copy-text { font-size: 13px; color: #1a1a1a; line-height: 1.55; }
+.planb-box { border-left: 3px solid #ddd; padding: 8px 12px; font-size: 12px; color: #666; line-height: 1.5; }
 
 /* TIMELINE */
-.tl-item { display: flex; gap: 10px; margin-bottom: 9px; align-items: flex-start; }
+.tl-item { display: flex; gap: 9px; margin-bottom: 8px; }
 .tl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-.dot-ok { background: #4caf50; }
-.dot-no { background: #ff9800; }
-.dot-wp { background: #2196f3; }
-.dot-ag { background: #9c27b0; }
-.dot-chat { background: #90a4ae; }
-.dot-update { background: #26a69a; }
+.d-ok{background:#4caf50} .d-no{background:#ff9800} .d-wp{background:#2196f3} .d-ag{background:#9c27b0} .d-chat{background:#90a4ae} .d-update{background:#26a69a}
 .tl-right { flex: 1; }
 .tl-fecha { font-size: 10px; color: #bbb; }
 .tl-texto { font-size: 12px; color: #555; margin-top: 1px; line-height: 1.4; }
 
-/* CHAT PANEL */
+/* CHAT */
 .chat-panel { display: flex; flex-direction: column; overflow: hidden; background: #fff; }
 .chat-messages { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
-
-.chat-empty { margin: auto; text-align: center; padding: 40px 24px; color: #bbb; max-width: 340px; }
-.ce-icon { font-size: 36px; margin-bottom: 12px; }
-.ce-text { font-size: 14px; line-height: 1.6; color: #999; }
+.chat-empty { margin: auto; text-align: center; padding: 40px 20px; max-width: 320px; }
+.ce-icon { font-size: 34px; margin-bottom: 10px; }
+.ce-text { font-size: 14px; color: #999; line-height: 1.6; }
 .ce-hints { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
-.ce-hint { background: #f0efeb; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #777; cursor: pointer; text-align: left; border: none; transition: background 0.15s; }
+.ce-hint { background: #f0efeb; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #666; cursor: pointer; text-align: left; border: none; transition: background 0.12s; }
 .ce-hint:hover { background: #e4e2dc; }
-
 .msg { max-width: 78%; display: flex; flex-direction: column; }
 .msg-user { align-self: flex-end; }
 .msg-bot { align-self: flex-start; }
-.bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+.bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; }
 .msg-user .bubble { background: #003087; color: #fff; border-bottom-right-radius: 4px; }
-.msg-bot .bubble { background: #f0efeb; color: #1a1a1a; border-bottom-left-radius: 4px; }
+.msg-bot .bubble { background: #f0efeb; color: #1a1a1a; border-bottom-left-radius: 4px; white-space: pre-wrap; }
 .msg-hora { font-size: 10px; color: #ccc; margin-top: 3px; padding: 0 4px; }
 .msg-user .msg-hora { text-align: right; }
 .update-chip { align-self: center; background: #e8f5e9; color: #2e7d32; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
-
-/* TYPING */
 .typing .bubble { display: flex; gap: 4px; align-items: center; padding: 13px 16px; }
 .dot-t { width: 7px; height: 7px; border-radius: 50%; background: #ccc; animation: bounce 1.2s infinite; }
-.dot-t:nth-child(2) { animation-delay: 0.2s; }
-.dot-t:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
-
-/* INPUT */
+.dot-t:nth-child(2){animation-delay:0.2s} .dot-t:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 .chat-input-row { border-top: 1px solid #eee; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }
 .chat-input { flex: 1; border: 1px solid #e0ddd6; border-radius: 20px; padding: 9px 16px; font-size: 14px; font-family: inherit; outline: none; resize: none; max-height: 110px; line-height: 1.4; transition: border-color 0.15s; background: #fafaf8; }
 .chat-input:focus { border-color: #003087; background: #fff; }
@@ -129,28 +147,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .send-btn:hover { background: #00256b; }
 .send-btn:disabled { background: #b0b8c8; cursor: not-allowed; }
 .send-btn svg { width: 17px; height: 17px; fill: #fff; }
-
 #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center; z-index: 300; }
 .spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top-color: #003087; border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-
 <div id="loadingOverlay"><div class="spinner"></div></div>
 
 <nav class="nav">
   <a class="nav-back" href="index.html">← Gestiones</a>
   <span class="nav-title" id="navTitle">Cargando...</span>
-  <div class="nav-badge"><span class="n" id="navScore">—</span><span class="d">/25</span></div>
-  <span class="nav-cl" id="navCl"></span>
+  <div class="nav-right">
+    <div class="nav-score"><span class="n" id="navScore">—</span><span class="d">/25</span></div>
+    <span class="nav-cl" id="navCl"></span>
+  </div>
 </nav>
 
 <div class="main">
   <!-- PANEL IZQUIERDO -->
   <div class="panel" id="panelLeft">
 
-    <div class="avatar-row">
+    <div class="lead-header">
       <div class="avatar" id="avatar">?</div>
       <div>
         <div class="lead-nombre" id="leadNombre">—</div>
@@ -158,38 +176,78 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
     </div>
 
-    <div class="score-card" id="scoreCard">
-      <div class="score-top">
-        <div>
-          <div class="score-num" id="scoreNum">—</div>
-          <div class="score-sub">Score de calificación</div>
-        </div>
-        <span class="cl-pill" id="clPill"></span>
+    <!-- SCORE — abierto por defecto -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle('secScore')">
+        <span class="sec-title">Score de calificación</span>
+        <span class="sec-chevron open" id="chevronSecScore">▼</span>
       </div>
-      <div class="score-bars" id="scoreBars"></div>
+      <div class="sec-body open" id="secScore">
+        <div class="score-top" style="margin-top:4px">
+          <div><div class="score-num" id="scoreNum">—</div><div class="score-sub">sobre 25 puntos</div></div>
+          <span class="cl-pill" id="clPill"></span>
+        </div>
+        <div id="scoreBars"></div>
+      </div>
     </div>
 
-    <div class="section">
-      <div class="sec-title">Estado SPIN</div>
-      <div class="spin-grid" id="spinGrid"></div>
-      <div class="etapa-box" id="etapaBox"></div>
+    <!-- SPIN — abierto por defecto -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle('secSpin')">
+        <span class="sec-title">Estado SPIN</span>
+        <span class="sec-chevron open" id="chevronSecSpin">▼</span>
+      </div>
+      <div class="sec-body open" id="secSpin">
+        <div class="spin-cards" id="spinCards" style="margin-top:4px"></div>
+        <div class="etapa-chip" id="etapaChip"></div>
+        <div class="spin-detail" id="spinDetail"></div>
+      </div>
     </div>
 
-    <div class="section">
-      <div class="sec-title">Diagnóstico</div>
-      <div class="updated-badge" id="updatedBadge" style="display:none">↑ Actualizado por chat</div>
-      <div class="diag-text" id="diagText">—</div>
+    <!-- DIAGNÓSTICO -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle('secDiag')">
+        <span class="sec-title">Diagnóstico</span>
+        <span class="sec-chevron open" id="chevronSecDiag">▼</span>
+      </div>
+      <div class="sec-body open" id="secDiag">
+        <div class="updated-badge" id="updatedBadge" style="display:none;margin-top:4px">↑ Actualizado por chat</div>
+        <div class="diag-text" id="diagText">—</div>
+      </div>
     </div>
 
-    <div class="section">
-      <div class="sec-title">Canal recomendado</div>
-      <div id="canalChip"></div>
-      <div class="canal-razon" id="canalRazon"></div>
+    <!-- CANAL -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle('secCanal')">
+        <span class="sec-title">Canal recomendado</span>
+        <span class="sec-chevron" id="chevronSecCanal">▼</span>
+      </div>
+      <div class="sec-body" id="secCanal">
+        <div style="margin-top:4px" id="canalChip"></div>
+        <div class="canal-razon" id="canalRazon"></div>
+      </div>
     </div>
 
-    <div class="section">
-      <div class="sec-title">Historial de contactos</div>
-      <div id="timeline"></div>
+    <!-- ACCIÓN RECOMENDADA — abierto por defecto -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle('secAccion')">
+        <span class="sec-title">Acción recomendada</span>
+        <span class="sec-chevron open" id="chevronSecAccion">▼</span>
+      </div>
+      <div class="sec-body open" id="secAccion">
+        <div id="accionContent"></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="sec">
+      <div class="sec-header" onclick="toggle('secTimeline')">
+        <span class="sec-title">Historial de contactos</span>
+        <span class="sec-chevron" id="chevronSecTimeline">▼</span>
+      </div>
+      <div class="sec-body" id="secTimeline">
+        <div id="timeline" style="margin-top:4px"></div>
+      </div>
     </div>
 
   </div>
@@ -204,7 +262,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <button class="ce-hint" onclick="quickSend('¿Cuál es el próximo paso con este lead?')">¿Cuál es el próximo paso?</button>
           <button class="ce-hint" onclick="quickSend('Dame el mensaje de WhatsApp para contactar')">Generame el mensaje de WhatsApp</button>
           <button class="ce-hint" onclick="quickSend('Dame el guión para la llamada')">Dame el guión de llamada</button>
-          <button class="ce-hint" onclick="quickSend('¿En qué etapa SPIN estamos y qué falta?')">¿Qué falta en el SPIN?</button>
+          <button class="ce-hint" onclick="quickSend('¿Qué falta para completar el SPIN?')">¿Qué falta en el SPIN?</button>
         </div>
       </div>
     </div>
@@ -225,12 +283,21 @@ let lead = null;
 let perfilActualizado = false;
 
 const barConfig = [
-  { label: 'Intención', key: 'score_intencion', cls: 'b0' },
-  { label: 'Cap. de pago', key: 'score_capacidad', cls: 'b1' },
-  { label: 'Urgencia', key: 'score_urgencia', cls: 'b2' },
-  { label: 'Engagement', key: 'score_engagement', cls: 'b3' },
-  { label: 'Fit producto', key: 'score_fit', cls: 'b4' }
+  { label: 'Intención', key: 'score_intencion', notaKey: 'score_intencion_nota', cls: 'b0' },
+  { label: 'Cap. de pago', key: 'score_capacidad', notaKey: 'score_capacidad_nota', cls: 'b1' },
+  { label: 'Urgencia', key: 'score_urgencia', notaKey: 'score_urgencia_nota', cls: 'b2' },
+  { label: 'Engagement', key: 'score_engagement', notaKey: 'score_engagement_nota', cls: 'b3' },
+  { label: 'Fit producto', key: 'score_fit', notaKey: 'score_fit_nota', cls: 'b4' }
 ];
+
+const spinNames = { S:'Situación', P:'Problema', I:'Implicación', N:'Need-Payoff' };
+
+function toggle(id) {
+  const body = document.getElementById(id);
+  const chevron = document.getElementById('chevron' + id.charAt(0).toUpperCase() + id.slice(1));
+  const isOpen = body.classList.toggle('open');
+  if (chevron) chevron.classList.toggle('open', isOpen);
+}
 
 async function init() {
   if (!phone) { location.href = 'index.html'; return; }
@@ -241,18 +308,16 @@ async function init() {
     lead = data.lead;
     renderPanel();
     renderChat();
-  } catch(e) { location.href = 'index.html'; }
+  } catch { location.href = 'index.html'; }
   document.getElementById('loadingOverlay').style.display = 'none';
 }
 
-function getLastGestion() {
-  return lead.gestiones?.[lead.gestiones.length - 1] || {};
-}
+function getG() { return lead.gestiones?.[lead.gestiones.length - 1] || {}; }
 
 function renderPanel() {
-  const g = getLastGestion();
+  const g = getG();
   const score = lead.ultimo_score || 0;
-  const iniciales = (lead.nombre || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const iniciales = (lead.nombre || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
 
   document.getElementById('avatar').textContent = iniciales;
   document.getElementById('leadNombre').textContent = lead.nombre || '—';
@@ -260,143 +325,177 @@ function renderPanel() {
   document.getElementById('navTitle').textContent = lead.nombre || '—';
   document.getElementById('navScore').textContent = score;
 
-  const scoreClass = score >= 20 ? 'score-hot' : score >= 14 ? 'score-warm' : score >= 8 ? 'score-cold' : 'score-dead';
-  const scoreEl = document.getElementById('scoreNum');
-  scoreEl.textContent = score;
-  scoreEl.className = 'score-num ' + scoreClass;
+  const cls = score >= 20 ? 'score-hot' : score >= 14 ? 'score-warm' : score >= 8 ? 'score-cold' : 'score-dead';
+  const sn = document.getElementById('scoreNum');
+  sn.textContent = score; sn.className = 'score-num ' + cls;
 
   const clText = score >= 20 ? '🔥 Caliente' : score >= 14 ? '🟡 Tibio' : score >= 8 ? '🔵 Frío' : '⚫ Muy frío';
   const clBg = score >= 20 ? '#ffebee' : score >= 14 ? '#fff8e1' : score >= 8 ? '#e3f2fd' : '#f5f5f5';
   const clColor = score >= 20 ? '#c62828' : score >= 14 ? '#f57f17' : score >= 8 ? '#1565c0' : '#757575';
-  const pill = document.getElementById('clPill');
-  pill.textContent = clText;
-  pill.style.background = clBg;
-  pill.style.color = clColor;
-  const navCl = document.getElementById('navCl');
-  navCl.textContent = clText;
-  navCl.style.background = clBg;
-  navCl.style.color = clColor;
+  ['clPill','navCl'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent = clText; el.style.background = clBg; el.style.color = clColor;
+  });
 
-  // Barras
+  // Barras con notas
   document.getElementById('scoreBars').innerHTML = barConfig.map(b => {
-    const val = g[b.key] || 3;
+    const val = g[b.key] || 0;
+    const nota = g[b.notaKey] || '';
     return `<div class="bar-row">
       <div class="bar-label">${b.label}</div>
       <div class="bar-track"><div class="bar-fill ${b.cls}" style="width:${val*20}%"></div></div>
       <div class="bar-val">${val}</div>
-    </div>`;
+    </div>${nota ? `<div class="bar-nota">${escHtml(nota)}</div>` : ''}`;
   }).join('');
 
-  // SPIN
-  const letras = ['S','P','I','N'];
-  const nombres = { S:'Situación', P:'Problema', I:'Implicación', N:'Need-Payoff' };
+  // SPIN cards
   const siguiente = g.spin_siguiente || '';
-  document.getElementById('spinGrid').innerHTML = letras.map(l => {
+  document.getElementById('spinCards').innerHTML = ['S','P','I','N'].map(l => {
     const ok = g['spin_'+l.toLowerCase()] === true;
     const isNext = !ok && l === siguiente;
-    const cls = ok ? 'ok' : isNext ? 'falta next' : 'falta';
-    const icon = ok ? '✓' : isNext ? '→' : '○';
-    return `<div class="spin-card ${cls}" title="${nombres[l]}">
+    const cls2 = ok ? 'ok' : isNext ? 'falta next' : 'falta';
+    return `<div class="spin-card ${cls2}">
       <div class="spin-letter">${l}</div>
-      <div class="spin-name">${nombres[l]}</div>
-      <div class="spin-icon">${icon}</div>
+      <div class="spin-sname">${spinNames[l]}</div>
+      <div class="spin-icon">${ok ? '✓' : isNext ? '→' : '○'}</div>
     </div>`;
   }).join('');
 
-  document.getElementById('etapaBox').textContent = g.spin_etapa || 'Sin información de etapa';
+  document.getElementById('etapaChip').textContent = g.spin_etapa || 'Sin información de etapa';
+
+  // SPIN detalle expandido
+  document.getElementById('spinDetail').innerHTML = ['S','P','I','N'].map(l => {
+    const lk = l.toLowerCase();
+    const ok = g['spin_'+lk] === true;
+    const detalle = g['spin_'+lk+'_detalle'] || '';
+    const falta = g['spin_'+lk+'_falta'] || '';
+    const isNext = !ok && l === siguiente;
+    const cls3 = ok ? 'ok sdi-ok' : isNext ? 'next sdi-falta' : 'falta sdi-falta';
+    const badge = ok ? 'Cubierto' : isNext ? 'Siguiente →' : 'Pendiente';
+    const texto = ok ? (detalle || 'Información disponible') : (falta || 'Falta información');
+    return `<div class="spin-detail-item ${ok ? 'ok' : isNext ? 'next' : 'falta'}">
+      <div class="sdi-header ${cls3}">
+        <span class="sdi-letter">${l}</span>
+        <span class="sdi-badge">${badge}</span>
+        <span style="font-size:11px;color:#888;font-weight:500">${spinNames[l]}</span>
+      </div>
+      <div class="sdi-text ${ok ? '' : 'sdi-falta'}">${escHtml(texto)}</div>
+    </div>`;
+  }).join('');
 
   // Diagnóstico
   document.getElementById('diagText').textContent = g.diagnostico || '—';
-  if (perfilActualizado) {
-    document.getElementById('updatedBadge').style.display = 'inline-flex';
-  }
+  if (perfilActualizado) document.getElementById('updatedBadge').style.display = 'inline-flex';
 
   // Canal
   const canal = g.canal || 'llamada';
-  document.getElementById('canalChip').innerHTML = `<div class="canal-chip ${canal === 'llamada' ? 'canal-llamada' : 'canal-wp'}">${canal === 'llamada' ? '📞 Llamada telefónica' : '💬 WhatsApp'}</div>`;
+  document.getElementById('canalChip').innerHTML = `<div class="canal-chip ${canal==='llamada'?'canal-llamada':'canal-wp'}">${canal==='llamada'?'📞 Llamada telefónica':'💬 WhatsApp'}</div>`;
   document.getElementById('canalRazon').textContent = g.razon_canal || '';
+
+  // Acción
+  let acHTML = '';
+  if (g.accion_objetivo) {
+    acHTML += `<div class="accion-label" style="margin-top:4px">Objetivo</div><div class="accion-box">${escHtml(g.accion_objetivo)}</div>`;
+  }
+  if (canal === 'llamada' && g.accion_apertura) {
+    acHTML += `<div class="accion-label">Apertura — primeros 30 segundos</div><div class="apertura-box">${escHtml(g.accion_apertura)}</div>`;
+  }
+  if (canal === 'llamada' && g.accion_checklist?.length) {
+    acHTML += `<div class="accion-label">Checklist de indagación</div><ul class="checklist">`;
+    g.accion_checklist.forEach(item => {
+      acHTML += `<li class="cl-item">
+        <div class="cl-punto">${escHtml(item.punto||'')}</div>
+        <div class="cl-pregunta">"${escHtml(item.pregunta_sugerida||'')}"</div>
+        <div class="cl-dato">Buscás saber: ${escHtml(item.dato_que_buscas||'')}</div>
+      </li>`;
+    });
+    acHTML += `</ul>`;
+  }
+  const msgKey = canal === 'llamada' ? 'accion_si_no_atiende' : 'accion_si_responde_wp';
+  const msgLabel = canal === 'llamada' ? 'Si no atiende — WhatsApp de respaldo' : 'Mensaje sugerido';
+  if (g[msgKey]) {
+    acHTML += `<div class="accion-label">${msgLabel}</div>
+    <div class="msg-copy-box">
+      <div class="msg-copy-header">
+        <span class="msg-copy-label">Listo para copiar</span>
+        <button class="btn-copy" onclick="copiarMsg()">Copiar</button>
+      </div>
+      <div class="msg-copy-text" id="msgCopyText">${escHtml(g[msgKey])}</div>
+    </div>`;
+  }
+  if (g.plan_b) {
+    acHTML += `<div class="accion-label" style="margin-top:10px">Plan B</div><div class="planb-box">${escHtml(g.plan_b)}</div>`;
+  }
+  document.getElementById('accionContent').innerHTML = acHTML || '<div style="font-size:13px;color:#aaa">Sin acción definida</div>';
 
   // Timeline
   const tlMap = {
-    atendio: { dot: 'dot-ok', texto: '✓ Atendió la llamada' },
-    no_atendio: { dot: 'dot-no', texto: '✗ No atendió' },
-    respondio_wp: { dot: 'dot-wp', texto: '💬 Respondió WhatsApp' },
-    agendo_visita: { dot: 'dot-ag', texto: '⭐ Agendó visita al salón' }
+    atendio: { d:'d-ok', t:'✓ Atendió la llamada' },
+    no_atendio: { d:'d-no', t:'✗ No atendió' },
+    respondio_wp: { d:'d-wp', t:'💬 Respondió WhatsApp' },
+    agendo_visita: { d:'d-ag', t:'⭐ Agendó visita al salón' }
   };
-  const eventos = [];
-  (lead.gestiones || []).forEach(gg => {
-    eventos.push({ fecha: gg.fecha?.split('T')[0], texto: `Análisis generado (score ${gg.score}/25)`, dot: 'dot-chat' });
+  const evs = [];
+  (lead.gestiones||[]).forEach(gg => {
+    evs.push({ f: gg.fecha?.split('T')[0], t: `Análisis generado (score ${gg.score}/25)`, d:'d-chat' });
     if (gg.resultado) {
-      const r = tlMap[gg.resultado] || { dot: 'dot-chat', texto: gg.resultado };
-      eventos.push({ fecha: gg.fecha_resultado?.split('T')[0] || gg.fecha?.split('T')[0], texto: r.texto + (gg.notas_resultado ? ': ' + gg.notas_resultado : ''), dot: r.dot });
+      const r = tlMap[gg.resultado] || { d:'d-chat', t: gg.resultado };
+      evs.push({ f: gg.fecha_resultado?.split('T')[0] || gg.fecha?.split('T')[0], t: r.t + (gg.notas_resultado ? ': '+gg.notas_resultado : ''), d: r.d });
     }
   });
-  if (lead.ultimo_chat) {
-    eventos.push({ fecha: lead.ultimo_chat.split('T')[0], texto: `Última conversación en chat`, dot: 'dot-update' });
-  }
-  const ultimos = eventos.slice(-6).reverse();
+  if (lead.ultimo_chat) evs.push({ f: lead.ultimo_chat.split('T')[0], t: 'Última conversación en chat', d:'d-update' });
+  const ultimos = evs.slice(-7).reverse();
   document.getElementById('timeline').innerHTML = ultimos.length
-    ? ultimos.map(e => `<div class="tl-item"><div class="tl-dot ${e.dot}"></div><div class="tl-right"><div class="tl-fecha">${e.fecha||'—'}</div><div class="tl-texto">${e.texto}</div></div></div>`).join('')
-    : '<div style="font-size:12px;color:#bbb">Sin eventos registrados</div>';
+    ? ultimos.map(e => `<div class="tl-item"><div class="tl-dot ${e.d}"></div><div class="tl-right"><div class="tl-fecha">${e.f||'—'}</div><div class="tl-texto">${e.t}</div></div></div>`).join('')
+    : '<div style="font-size:12px;color:#bbb">Sin eventos</div>';
 }
 
 function renderChat() {
-  const history = lead.chat_history || [];
-  if (!history.length) return;
-  const container = document.getElementById('chatMessages');
-  container.innerHTML = '';
-  history.forEach(m => appendBubble(m.role, m.content, m.fecha));
-  container.scrollTop = container.scrollHeight;
+  const h = lead.chat_history || [];
+  if (!h.length) return;
+  const c = document.getElementById('chatMessages');
+  c.innerHTML = '';
+  h.forEach(m => appendBubble(m.role, m.content, m.fecha));
+  c.scrollTop = c.scrollHeight;
 }
 
 function appendBubble(role, content, fecha) {
-  const container = document.getElementById('chatMessages');
+  const c = document.getElementById('chatMessages');
   document.getElementById('chatEmpty')?.remove();
-
   const div = document.createElement('div');
-  div.className = `msg msg-${role === 'user' ? 'user' : 'bot'}`;
-  const hora = fecha ? new Date(fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
-  div.innerHTML = `<div class="bubble">${escHtml(content)}</div><div class="msg-hora">${hora}</div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-  return div;
-}
-
-function showUpdateChip() {
-  const container = document.getElementById('chatMessages');
-  const div = document.createElement('div');
-  div.className = 'update-chip';
-  div.textContent = '↑ Perfil del lead actualizado';
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+  div.className = `msg msg-${role==='user'?'user':'bot'}`;
+  const hora = fecha ? new Date(fecha).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '';
+  div.innerHTML = `<div class="bubble">${role==='user'?escHtml(content):escHtml(content)}</div><div class="msg-hora">${hora}</div>`;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
 }
 
 function showTyping() {
-  const container = document.getElementById('chatMessages');
+  const c = document.getElementById('chatMessages');
   const div = document.createElement('div');
-  div.className = 'msg msg-bot typing';
-  div.id = 'typingDot';
+  div.className = 'msg msg-bot typing'; div.id = 'typingDot';
   div.innerHTML = `<div class="bubble"><div class="dot-t"></div><div class="dot-t"></div><div class="dot-t"></div></div>`;
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+  c.appendChild(div); c.scrollTop = c.scrollHeight;
 }
 
-function hideTyping() {
-  document.getElementById('typingDot')?.remove();
+function hideTyping() { document.getElementById('typingDot')?.remove(); }
+
+function showUpdateChip() {
+  const c = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'update-chip';
+  div.textContent = '↑ Perfil del lead actualizado';
+  c.appendChild(div); c.scrollTop = c.scrollHeight;
 }
 
 async function enviar() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if (!msg || !phone) return;
-
-  input.value = '';
-  input.style.height = 'auto';
+  input.value = ''; input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
-
   appendBubble('user', msg, new Date().toISOString());
   showTyping();
-
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
@@ -405,63 +504,41 @@ async function enviar() {
     });
     const data = await res.json();
     hideTyping();
-
     if (data.respuesta) {
       appendBubble('assistant', data.respuesta, data.fecha);
-
-      // Auto-actualizar panel si el perfil cambió
       if (data.perfil_actualizado && data.lead_actualizado) {
         const lu = data.lead_actualizado;
-        const g = getLastGestion();
-        if (lu.diagnostico !== undefined && lu.diagnostico !== null) g.diagnostico = lu.diagnostico;
-        if (lu.spin_s !== undefined && lu.spin_s !== null) g.spin_s = lu.spin_s;
-        if (lu.spin_p !== undefined && lu.spin_p !== null) g.spin_p = lu.spin_p;
-        if (lu.spin_i !== undefined && lu.spin_i !== null) g.spin_i = lu.spin_i;
-        if (lu.spin_n !== undefined && lu.spin_n !== null) g.spin_n = lu.spin_n;
-        if (lu.spin_etapa !== undefined && lu.spin_etapa !== null) g.spin_etapa = lu.spin_etapa;
-        if (lu.spin_siguiente !== undefined && lu.spin_siguiente !== null) g.spin_siguiente = lu.spin_siguiente;
-        if (lu.canal !== undefined && lu.canal !== null) g.canal = lu.canal;
-        if (lu.score !== undefined) lead.ultimo_score = lu.score;
-        if (lu.modelo !== undefined && lu.modelo !== null) lead.modelo = lu.modelo;
+        const g = getG();
+        Object.keys(lu).forEach(k => { if (lu[k] !== null && lu[k] !== undefined) { if (k==='score') lead.ultimo_score=lu[k]; else if (k==='modelo') lead.modelo=lu[k]; else g[k]=lu[k]; } });
         perfilActualizado = true;
         renderPanel();
         showUpdateChip();
       }
-
-      // Actualizar historial local
       if (!lead.chat_history) lead.chat_history = [];
-      lead.chat_history.push({ role: 'user', content: msg, fecha: new Date().toISOString() });
-      lead.chat_history.push({ role: 'assistant', content: data.respuesta, fecha: data.fecha });
-
+      const ahora = new Date().toISOString();
+      lead.chat_history.push({ role:'user', content:msg, fecha:ahora });
+      lead.chat_history.push({ role:'assistant', content:data.respuesta, fecha:data.fecha });
     } else {
       appendBubble('assistant', 'Error al procesar el mensaje.', new Date().toISOString());
     }
-  } catch(e) {
-    hideTyping();
-    appendBubble('assistant', 'Error de red. Verificá la conexión.', new Date().toISOString());
-  }
-
+  } catch { hideTyping(); appendBubble('assistant', 'Error de red.', new Date().toISOString()); }
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('chatInput').focus();
 }
 
-function quickSend(texto) {
-  document.getElementById('chatInput').value = texto;
-  enviar();
+function copiarMsg() {
+  const el = document.getElementById('msgCopyText');
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    if (btn) { btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  });
 }
 
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-}
-
-function escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-}
+function quickSend(t) { document.getElementById('chatInput').value = t; enviar(); }
+function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 init();
 </script>
