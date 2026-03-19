@@ -75,6 +75,7 @@ Para mensajes WhatsApp:
 - Máximo 4 oraciones. Tono de persona real, no de vendedor.
 - NUNCA mencionar que el cliente no respondió.
 - NUNCA urgencia fabricada.
+- NUNCA usar guiones " - " para conectar frases. Usá punto o coma.
 - Con al menos un detalle personal del historial.
 - Terminar con pregunta concreta y binaria.
 
