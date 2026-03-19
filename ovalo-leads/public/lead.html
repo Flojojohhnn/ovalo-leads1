@@ -6,179 +6,212 @@
 <title>Lead — Óvalo Leads</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0efeb; color: #1a1a1a; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0efeb; color: #1a1a1a; display: flex; flex-direction: column; }
 
 /* NAV */
-.nav { background: #003087; display: flex; align-items: center; padding: 0 20px; height: 50px; flex-shrink: 0; gap: 12px; }
-.nav-back { color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+.nav { background: #003087; display: flex; align-items: center; padding: 0 20px; height: 50px; flex-shrink: 0; gap: 14px; }
+.nav-back { color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; text-decoration: none; white-space: nowrap; }
 .nav-back:hover { color: #fff; }
-.nav-title { color: #fff; font-size: 15px; font-weight: 600; flex: 1; }
-.nav-score { display: flex; align-items: center; gap: 6px; }
-.nav-score-num { color: #fff; font-size: 20px; font-weight: 700; }
-.nav-score-den { color: rgba(255,255,255,0.5); font-size: 13px; }
+.nav-title { color: #fff; font-size: 15px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-badge { display: flex; align-items: baseline; gap: 3px; }
+.nav-badge .n { color: #fff; font-size: 22px; font-weight: 800; }
+.nav-badge .d { color: rgba(255,255,255,0.45); font-size: 12px; }
+.nav-cl { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 5px; }
 
-/* LAYOUT */
-.main { display: grid; grid-template-columns: 340px 1fr; flex: 1; overflow: hidden; }
+/* MAIN */
+.main { display: grid; grid-template-columns: 1fr 1fr; flex: 1; overflow: hidden; min-height: 0; }
 
-/* PANEL IZQUIERDO */
-.panel { background: #fff; border-right: 1px solid #e4e2dc; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+/* PANEL ESQUERDO — scrollable */
+.panel { overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid #e4e2dc; background: #fafaf8; }
 
-.avatar-row { display: flex; align-items: center; gap: 14px; }
-.avatar { width: 52px; height: 52px; border-radius: 50%; background: #003087; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; }
-.lead-nombre { font-size: 17px; font-weight: 700; line-height: 1.2; }
-.lead-modelo { font-size: 13px; color: #888; margin-top: 3px; }
+.avatar-row { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: #003087; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.lead-nombre { font-size: 16px; font-weight: 700; }
+.lead-modelo { font-size: 12px; color: #888; margin-top: 2px; }
 
-.score-visual { background: #f8f7f3; border-radius: 12px; padding: 16px; }
-.score-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.score-big { font-size: 36px; font-weight: 800; line-height: 1; }
+/* SCORE CARD */
+.score-card { background: #fff; border-radius: 12px; border: 1px solid #e4e2dc; padding: 14px; }
+.score-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.score-num { font-size: 42px; font-weight: 900; line-height: 1; }
 .score-hot { color: #e53935; }
 .score-warm { color: #f57f17; }
 .score-cold { color: #1565c0; }
 .score-dead { color: #9e9e9e; }
-.score-label { font-size: 12px; color: #888; font-weight: 500; }
-.score-cl-badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
-.score-bar-row { margin-bottom: 8px; }
-.score-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-bottom: 4px; }
-.score-bar-track { height: 6px; background: #e8e6e0; border-radius: 3px; overflow: hidden; }
-.score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
-.bar-intencion { background: #5c6bc0; }
-.bar-capacidad { background: #26a69a; }
-.bar-urgencia { background: #ef5350; }
-.bar-engagement { background: #ab47bc; }
-.bar-fit { background: #66bb6a; }
+.score-sub { font-size: 11px; color: #aaa; margin-top: 3px; }
+.cl-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.score-bars { display: flex; flex-direction: column; gap: 7px; }
+.bar-row { display: grid; grid-template-columns: 90px 1fr 22px; align-items: center; gap: 8px; }
+.bar-label { font-size: 11px; color: #777; text-align: right; }
+.bar-track { height: 7px; background: #eee; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.bar-val { font-size: 11px; color: #999; text-align: center; }
+.b0 { background: #5c6bc0; }
+.b1 { background: #26a69a; }
+.b2 { background: #ef5350; }
+.b3 { background: #ab47bc; }
+.b4 { background: #66bb6a; }
 
-.spin-section { }
-.section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; margin-bottom: 10px; }
-.spin-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.spin-card { border-radius: 8px; padding: 10px 6px; text-align: center; border: 1.5px solid transparent; }
+/* SECCIONES */
+.section { background: #fff; border-radius: 12px; border: 1px solid #e4e2dc; padding: 14px; }
+.sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #bbb; margin-bottom: 10px; }
+
+/* SPIN */
+.spin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+.spin-card { border-radius: 8px; padding: 10px 4px; text-align: center; border: 1.5px solid transparent; transition: all 0.3s; }
 .spin-card.ok { background: #e8f5e9; border-color: #a5d6a7; }
 .spin-card.falta { background: #fff8e1; border-color: #ffe082; }
-.spin-card.falta.next { background: #fff3e0; border-color: #ffb74d; }
-.spin-card .sl { font-size: 18px; font-weight: 800; }
-.spin-card.ok .sl { color: #2e7d32; }
-.spin-card.falta .sl { color: #f57f17; }
-.spin-card .sn { font-size: 9px; color: #888; margin-top: 2px; }
-.spin-card .si { font-size: 14px; margin-top: 2px; }
-.etapa-chip { background: #fff3e0; border-radius: 7px; padding: 8px 12px; font-size: 12px; color: #e65100; margin-top: 8px; }
+.spin-card.next { background: #fff3e0; border-color: #ffb74d; }
+.spin-letter { font-size: 17px; font-weight: 800; }
+.spin-card.ok .spin-letter { color: #2e7d32; }
+.spin-card.falta .spin-letter { color: #f57f17; }
+.spin-card.next .spin-letter { color: #e65100; }
+.spin-name { font-size: 9px; color: #888; margin-top: 1px; }
+.spin-icon { font-size: 13px; margin-top: 2px; }
+.etapa-box { background: #fff3e0; border-radius: 7px; padding: 8px 11px; font-size: 12px; color: #e65100; line-height: 1.4; }
 
-.canal-section { }
-.canal-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; }
+/* DIAGNÓSTICO */
+.diag-text { font-size: 13px; color: #444; line-height: 1.6; white-space: pre-line; }
+.updated-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; background: #e8f5e9; color: #2e7d32; padding: 2px 7px; border-radius: 4px; margin-bottom: 6px; }
+
+/* CANAL */
+.canal-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border-radius: 8px; font-size: 13px; font-weight: 600; }
 .canal-llamada { background: #e3f0ff; color: #003087; }
 .canal-wp { background: #e8f5e9; color: #1b5e20; }
+.canal-razon { font-size: 12px; color: #888; margin-top: 6px; font-style: italic; }
 
-.timeline-section { }
-.timeline-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
-.tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
-.tl-dot-ok { background: #4caf50; }
-.tl-dot-no { background: #ff9800; }
-.tl-dot-wp { background: #2196f3; }
-.tl-dot-ag { background: #9c27b0; }
-.tl-dot-chat { background: #607d8b; }
-.tl-content { flex: 1; }
-.tl-fecha { font-size: 11px; color: #aaa; }
-.tl-texto { font-size: 12px; color: #555; margin-top: 1px; }
+/* TIMELINE */
+.tl-item { display: flex; gap: 10px; margin-bottom: 9px; align-items: flex-start; }
+.tl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.dot-ok { background: #4caf50; }
+.dot-no { background: #ff9800; }
+.dot-wp { background: #2196f3; }
+.dot-ag { background: #9c27b0; }
+.dot-chat { background: #90a4ae; }
+.dot-update { background: #26a69a; }
+.tl-right { flex: 1; }
+.tl-fecha { font-size: 10px; color: #bbb; }
+.tl-texto { font-size: 12px; color: #555; margin-top: 1px; line-height: 1.4; }
 
-/* CHAT */
-.chat-panel { display: flex; flex-direction: column; overflow: hidden; }
-.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.chat-empty { text-align: center; padding: 60px 20px; color: #aaa; }
-.chat-empty .ce-icon { font-size: 40px; margin-bottom: 12px; }
-.chat-empty p { font-size: 14px; line-height: 1.6; }
-.chat-empty .ce-hint { font-size: 12px; color: #bbb; margin-top: 8px; }
+/* CHAT PANEL */
+.chat-panel { display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
 
-.msg { max-width: 80%; display: flex; flex-direction: column; }
+.chat-empty { margin: auto; text-align: center; padding: 40px 24px; color: #bbb; max-width: 340px; }
+.ce-icon { font-size: 36px; margin-bottom: 12px; }
+.ce-text { font-size: 14px; line-height: 1.6; color: #999; }
+.ce-hints { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.ce-hint { background: #f0efeb; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #777; cursor: pointer; text-align: left; border: none; transition: background 0.15s; }
+.ce-hint:hover { background: #e4e2dc; }
+
+.msg { max-width: 78%; display: flex; flex-direction: column; }
 .msg-user { align-self: flex-end; }
-.msg-assistant { align-self: flex-start; }
-.msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
-.msg-user .msg-bubble { background: #003087; color: #fff; border-bottom-right-radius: 4px; }
-.msg-assistant .msg-bubble { background: #fff; border: 1px solid #e4e2dc; color: #1a1a1a; border-bottom-left-radius: 4px; }
-.msg-fecha { font-size: 10px; color: #bbb; margin-top: 3px; padding: 0 4px; }
-.msg-user .msg-fecha { text-align: right; }
+.msg-bot { align-self: flex-start; }
+.bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+.msg-user .bubble { background: #003087; color: #fff; border-bottom-right-radius: 4px; }
+.msg-bot .bubble { background: #f0efeb; color: #1a1a1a; border-bottom-left-radius: 4px; }
+.msg-hora { font-size: 10px; color: #ccc; margin-top: 3px; padding: 0 4px; }
+.msg-user .msg-hora { text-align: right; }
+.update-chip { align-self: center; background: #e8f5e9; color: #2e7d32; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 12px; }
 
-.chat-input-row { border-top: 1px solid #e4e2dc; padding: 14px 16px; display: flex; gap: 10px; align-items: flex-end; background: #fff; flex-shrink: 0; }
-.chat-input { flex: 1; border: 1px solid #e0ddd6; border-radius: 20px; padding: 10px 16px; font-size: 14px; font-family: inherit; outline: none; resize: none; max-height: 120px; line-height: 1.4; transition: border-color 0.15s; background: #fafaf8; }
+/* TYPING */
+.typing .bubble { display: flex; gap: 4px; align-items: center; padding: 13px 16px; }
+.dot-t { width: 7px; height: 7px; border-radius: 50%; background: #ccc; animation: bounce 1.2s infinite; }
+.dot-t:nth-child(2) { animation-delay: 0.2s; }
+.dot-t:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+/* INPUT */
+.chat-input-row { border-top: 1px solid #eee; padding: 12px 16px; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }
+.chat-input { flex: 1; border: 1px solid #e0ddd6; border-radius: 20px; padding: 9px 16px; font-size: 14px; font-family: inherit; outline: none; resize: none; max-height: 110px; line-height: 1.4; transition: border-color 0.15s; background: #fafaf8; }
 .chat-input:focus { border-color: #003087; background: #fff; }
-.chat-send { width: 40px; height: 40px; border-radius: 50%; background: #003087; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
-.chat-send:hover { background: #00256b; }
-.chat-send:disabled { background: #b0b8c8; cursor: not-allowed; }
-.chat-send svg { width: 18px; height: 18px; fill: #fff; }
+.send-btn { width: 38px; height: 38px; border-radius: 50%; background: #003087; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+.send-btn:hover { background: #00256b; }
+.send-btn:disabled { background: #b0b8c8; cursor: not-allowed; }
+.send-btn svg { width: 17px; height: 17px; fill: #fff; }
 
-.typing { align-self: flex-start; }
-.typing .msg-bubble { display: flex; gap: 4px; align-items: center; padding: 12px 16px; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; animation: bounce 1.2s infinite; }
-.dot:nth-child(2) { animation-delay: 0.2s; }
-.dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
-
-#loadingPanel { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index: 200; }
-.spinner { width: 32px; height: 32px; border: 3px solid #e0ddd6; border-top-color: #003087; border-radius: 50%; animation: spin 0.7s linear infinite; }
+#loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center; z-index: 300; }
+.spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top-color: #003087; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div id="loadingPanel"><div class="spinner"></div></div>
+<div id="loadingOverlay"><div class="spinner"></div></div>
 
 <nav class="nav">
-  <a class="nav-back" href="index.html">← Mis gestiones</a>
+  <a class="nav-back" href="index.html">← Gestiones</a>
   <span class="nav-title" id="navTitle">Cargando...</span>
-  <div class="nav-score">
-    <span class="nav-score-num" id="navScore">—</span>
-    <span class="nav-score-den">/25</span>
-  </div>
+  <div class="nav-badge"><span class="n" id="navScore">—</span><span class="d">/25</span></div>
+  <span class="nav-cl" id="navCl"></span>
 </nav>
 
 <div class="main">
   <!-- PANEL IZQUIERDO -->
   <div class="panel" id="panelLeft">
+
     <div class="avatar-row">
-      <div class="avatar" id="avatar"></div>
+      <div class="avatar" id="avatar">?</div>
       <div>
         <div class="lead-nombre" id="leadNombre">—</div>
         <div class="lead-modelo" id="leadModelo">—</div>
       </div>
     </div>
 
-    <div class="score-visual">
+    <div class="score-card" id="scoreCard">
       <div class="score-top">
         <div>
-          <div class="score-big" id="scoreBig">—</div>
-          <div class="score-label">Score</div>
+          <div class="score-num" id="scoreNum">—</div>
+          <div class="score-sub">Score de calificación</div>
         </div>
-        <span class="score-cl-badge" id="scoreClBadge"></span>
+        <span class="cl-pill" id="clPill"></span>
       </div>
-      <div id="scoreBars"></div>
+      <div class="score-bars" id="scoreBars"></div>
     </div>
 
-    <div class="spin-section">
-      <div class="section-title">Estado SPIN</div>
-      <div class="spin-row" id="spinRow"></div>
-      <div class="etapa-chip" id="etapaChip"></div>
+    <div class="section">
+      <div class="sec-title">Estado SPIN</div>
+      <div class="spin-grid" id="spinGrid"></div>
+      <div class="etapa-box" id="etapaBox"></div>
     </div>
 
-    <div class="canal-section">
-      <div class="section-title">Canal recomendado</div>
+    <div class="section">
+      <div class="sec-title">Diagnóstico</div>
+      <div class="updated-badge" id="updatedBadge" style="display:none">↑ Actualizado por chat</div>
+      <div class="diag-text" id="diagText">—</div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Canal recomendado</div>
       <div id="canalChip"></div>
+      <div class="canal-razon" id="canalRazon"></div>
     </div>
 
-    <div class="timeline-section">
-      <div class="section-title">Historial de contactos</div>
+    <div class="section">
+      <div class="sec-title">Historial de contactos</div>
       <div id="timeline"></div>
     </div>
+
   </div>
 
   <!-- CHAT -->
   <div class="chat-panel">
     <div class="chat-messages" id="chatMessages">
-      <div class="chat-empty">
+      <div class="chat-empty" id="chatEmpty">
         <div class="ce-icon">💬</div>
-        <p>El asistente ya conoce el análisis completo de este lead. Escribí lo que pasó, preguntá algo, o pedí el próximo mensaje.</p>
-        <div class="ce-hint">Ej: "Lo llamé, me dijo que está evaluando Toyota Hilux" · "Dame el mensaje para WhatsApp" · "¿Qué pregunto en la llamada?"</div>
+        <div class="ce-text">El asistente ya conoce el análisis completo. Escribí lo que pasó o pedí lo que necesitás.</div>
+        <div class="ce-hints">
+          <button class="ce-hint" onclick="quickSend('¿Cuál es el próximo paso con este lead?')">¿Cuál es el próximo paso?</button>
+          <button class="ce-hint" onclick="quickSend('Dame el mensaje de WhatsApp para contactar')">Generame el mensaje de WhatsApp</button>
+          <button class="ce-hint" onclick="quickSend('Dame el guión para la llamada')">Dame el guión de llamada</button>
+          <button class="ce-hint" onclick="quickSend('¿En qué etapa SPIN estamos y qué falta?')">¿Qué falta en el SPIN?</button>
+        </div>
       </div>
     </div>
     <div class="chat-input-row">
-      <textarea class="chat-input" id="chatInput" placeholder="Escribí acá..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="chat-send" id="sendBtn" onclick="enviarMensaje()">
+      <textarea class="chat-input" id="chatInput" placeholder="Escribí lo que pasó, preguntá algo, o pedí un mensaje..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="enviar()">
         <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
       </button>
     </div>
@@ -189,140 +222,151 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 const params = new URLSearchParams(location.search);
 const phone = params.get('phone');
 let lead = null;
+let perfilActualizado = false;
 
-async function kvGet(key) {
-  const res = await fetch(`/api/lead?phone=${encodeURIComponent(key)}`);
-  const data = await res.json();
-  return data.found ? data.lead : null;
-}
+const barConfig = [
+  { label: 'Intención', key: 'score_intencion', cls: 'b0' },
+  { label: 'Cap. de pago', key: 'score_capacidad', cls: 'b1' },
+  { label: 'Urgencia', key: 'score_urgencia', cls: 'b2' },
+  { label: 'Engagement', key: 'score_engagement', cls: 'b3' },
+  { label: 'Fit producto', key: 'score_fit', cls: 'b4' }
+];
 
 async function init() {
   if (!phone) { location.href = 'index.html'; return; }
-  lead = await kvGet(phone);
-  if (!lead) { location.href = 'index.html'; return; }
-  renderPanel();
-  renderChat();
-  document.getElementById('loadingPanel').style.display = 'none';
+  try {
+    const res = await fetch(`/api/lead?phone=${encodeURIComponent(phone)}`);
+    const data = await res.json();
+    if (!data.found) { location.href = 'index.html'; return; }
+    lead = data.lead;
+    renderPanel();
+    renderChat();
+  } catch(e) { location.href = 'index.html'; }
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function getLastGestion() {
+  return lead.gestiones?.[lead.gestiones.length - 1] || {};
 }
 
 function renderPanel() {
-  const g = lead.gestiones?.[lead.gestiones.length - 1] || {};
+  const g = getLastGestion();
   const score = lead.ultimo_score || 0;
-
-  // Avatar
   const iniciales = (lead.nombre || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-  document.getElementById('avatar').textContent = iniciales;
 
+  document.getElementById('avatar').textContent = iniciales;
   document.getElementById('leadNombre').textContent = lead.nombre || '—';
   document.getElementById('leadModelo').textContent = lead.modelo || 'Modelo no definido';
   document.getElementById('navTitle').textContent = lead.nombre || '—';
   document.getElementById('navScore').textContent = score;
 
-  // Score big
-  const scoreEl = document.getElementById('scoreBig');
+  const scoreClass = score >= 20 ? 'score-hot' : score >= 14 ? 'score-warm' : score >= 8 ? 'score-cold' : 'score-dead';
+  const scoreEl = document.getElementById('scoreNum');
   scoreEl.textContent = score;
-  scoreEl.className = 'score-big ' + (score >= 20 ? 'score-hot' : score >= 14 ? 'score-warm' : score >= 8 ? 'score-cold' : 'score-dead');
+  scoreEl.className = 'score-num ' + scoreClass;
 
-  const clMap = { 'Lead caliente': '#ffebee', 'Lead tibio': '#fff8e1', 'Lead frío': '#e3f2fd', 'Lead muy frío': '#f5f5f5' };
-  const clTextMap = { 'Lead caliente': '#c62828', 'Lead tibio': '#f57f17', 'Lead frío': '#1565c0', 'Lead muy frío': '#757575' };
-  const cl = g.clasificacion || '';
-  const badge = document.getElementById('scoreClBadge');
-  badge.textContent = score >= 20 ? '🔥 Caliente' : score >= 14 ? '🟡 Tibio' : score >= 8 ? '🔵 Frío' : '⚫ Muy frío';
-  badge.style.background = score >= 20 ? '#ffebee' : score >= 14 ? '#fff8e1' : score >= 8 ? '#e3f2fd' : '#f5f5f5';
-  badge.style.color = score >= 20 ? '#c62828' : score >= 14 ? '#f57f17' : score >= 8 ? '#1565c0' : '#757575';
+  const clText = score >= 20 ? '🔥 Caliente' : score >= 14 ? '🟡 Tibio' : score >= 8 ? '🔵 Frío' : '⚫ Muy frío';
+  const clBg = score >= 20 ? '#ffebee' : score >= 14 ? '#fff8e1' : score >= 8 ? '#e3f2fd' : '#f5f5f5';
+  const clColor = score >= 20 ? '#c62828' : score >= 14 ? '#f57f17' : score >= 8 ? '#1565c0' : '#757575';
+  const pill = document.getElementById('clPill');
+  pill.textContent = clText;
+  pill.style.background = clBg;
+  pill.style.color = clColor;
+  const navCl = document.getElementById('navCl');
+  navCl.textContent = clText;
+  navCl.style.background = clBg;
+  navCl.style.color = clColor;
 
-  // Barras de score
-  const criterios = [
-    { key: 'spin_s', label: 'Situación', cls: 'bar-intencion' },
-    { key: 'spin_p', label: 'Problema', cls: 'bar-capacidad' },
-    { key: 'spin_i', label: 'Implicación', cls: 'bar-urgencia' },
-    { key: 'spin_n', label: 'Need-Payoff', cls: 'bar-engagement' },
-  ];
-  // Usamos los criterios de score reales si están en la gestión
-  const barData = [
-    { label: 'Intención', cls: 'bar-intencion', val: g.score_intencion || Math.floor(Math.random()*3)+2 },
-    { label: 'Cap. de pago', cls: 'bar-capacidad', val: g.score_capacidad || Math.floor(Math.random()*3)+2 },
-    { label: 'Urgencia', cls: 'bar-urgencia', val: g.score_urgencia || Math.floor(Math.random()*3)+1 },
-    { label: 'Engagement', cls: 'bar-engagement', val: g.score_engagement || Math.floor(Math.random()*3)+1 },
-    { label: 'Fit producto', cls: 'bar-fit', val: g.score_fit || Math.floor(Math.random()*2)+3 },
-  ];
-
-  document.getElementById('scoreBars').innerHTML = barData.map(b => `
-    <div class="score-bar-row">
-      <div class="score-bar-label"><span>${b.label}</span><span>${b.val}/5</span></div>
-      <div class="score-bar-track"><div class="score-bar-fill ${b.cls}" style="width:${b.val*20}%"></div></div>
-    </div>`).join('');
-
-  // SPIN
-  const letras = ['S','P','I','N'];
-  const nombres = { S:'Situación', P:'Problema', I:'Implicación', N:'Need' };
-  const siguiente = g.spin_siguiente || '';
-  document.getElementById('spinRow').innerHTML = letras.map(l => {
-    const ok = g['spin_'+l.toLowerCase()] === true;
-    const isNext = !ok && l === siguiente;
-    return `<div class="spin-card ${ok ? 'ok' : 'falta'}${isNext ? ' next' : ''}" title="${nombres[l]}">
-      <div class="sl">${l}</div>
-      <div class="sn">${nombres[l]}</div>
-      <div class="si">${ok ? '✓' : isNext ? '→' : '○'}</div>
+  // Barras
+  document.getElementById('scoreBars').innerHTML = barConfig.map(b => {
+    const val = g[b.key] || 3;
+    return `<div class="bar-row">
+      <div class="bar-label">${b.label}</div>
+      <div class="bar-track"><div class="bar-fill ${b.cls}" style="width:${val*20}%"></div></div>
+      <div class="bar-val">${val}</div>
     </div>`;
   }).join('');
 
-  document.getElementById('etapaChip').textContent = g.spin_etapa || '—';
+  // SPIN
+  const letras = ['S','P','I','N'];
+  const nombres = { S:'Situación', P:'Problema', I:'Implicación', N:'Need-Payoff' };
+  const siguiente = g.spin_siguiente || '';
+  document.getElementById('spinGrid').innerHTML = letras.map(l => {
+    const ok = g['spin_'+l.toLowerCase()] === true;
+    const isNext = !ok && l === siguiente;
+    const cls = ok ? 'ok' : isNext ? 'falta next' : 'falta';
+    const icon = ok ? '✓' : isNext ? '→' : '○';
+    return `<div class="spin-card ${cls}" title="${nombres[l]}">
+      <div class="spin-letter">${l}</div>
+      <div class="spin-name">${nombres[l]}</div>
+      <div class="spin-icon">${icon}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('etapaBox').textContent = g.spin_etapa || 'Sin información de etapa';
+
+  // Diagnóstico
+  document.getElementById('diagText').textContent = g.diagnostico || '—';
+  if (perfilActualizado) {
+    document.getElementById('updatedBadge').style.display = 'inline-flex';
+  }
 
   // Canal
   const canal = g.canal || 'llamada';
   document.getElementById('canalChip').innerHTML = `<div class="canal-chip ${canal === 'llamada' ? 'canal-llamada' : 'canal-wp'}">${canal === 'llamada' ? '📞 Llamada telefónica' : '💬 WhatsApp'}</div>`;
+  document.getElementById('canalRazon').textContent = g.razon_canal || '';
 
   // Timeline
   const tlMap = {
-    atendio: { dot: 'tl-dot-ok', texto: '✓ Atendió la llamada' },
-    no_atendio: { dot: 'tl-dot-no', texto: '✗ No atendió' },
-    respondio_wp: { dot: 'tl-dot-wp', texto: '💬 Respondió WhatsApp' },
-    agendo_visita: { dot: 'tl-dot-ag', texto: '⭐ Agendó visita al salón' }
+    atendio: { dot: 'dot-ok', texto: '✓ Atendió la llamada' },
+    no_atendio: { dot: 'dot-no', texto: '✗ No atendió' },
+    respondio_wp: { dot: 'dot-wp', texto: '💬 Respondió WhatsApp' },
+    agendo_visita: { dot: 'dot-ag', texto: '⭐ Agendó visita al salón' }
   };
-
   const eventos = [];
-  (lead.gestiones || []).forEach(g => {
-    eventos.push({ fecha: g.fecha?.split('T')[0], texto: `Análisis generado (score ${g.score}/25)`, dot: 'tl-dot-chat' });
-    if (g.resultado) eventos.push({ fecha: g.fecha_resultado?.split('T')[0] || g.fecha?.split('T')[0], texto: tlMap[g.resultado]?.texto || g.resultado, dot: tlMap[g.resultado]?.dot || 'tl-dot-chat' });
+  (lead.gestiones || []).forEach(gg => {
+    eventos.push({ fecha: gg.fecha?.split('T')[0], texto: `Análisis generado (score ${gg.score}/25)`, dot: 'dot-chat' });
+    if (gg.resultado) {
+      const r = tlMap[gg.resultado] || { dot: 'dot-chat', texto: gg.resultado };
+      eventos.push({ fecha: gg.fecha_resultado?.split('T')[0] || gg.fecha?.split('T')[0], texto: r.texto + (gg.notas_resultado ? ': ' + gg.notas_resultado : ''), dot: r.dot });
+    }
   });
-
-  const chatEvts = (lead.chat_history || []).filter(m => m.role === 'user').slice(-3).map(m => ({
-    fecha: m.fecha?.split('T')[0] || '—',
-    texto: `Chat: "${m.content.substring(0, 50)}${m.content.length > 50 ? '...' : ''}"`,
-    dot: 'tl-dot-chat'
-  }));
-
-  const todos = [...eventos, ...chatEvts].slice(-6).reverse();
-  document.getElementById('timeline').innerHTML = todos.length ? todos.map(e => `
-    <div class="timeline-item">
-      <div class="tl-dot ${e.dot}"></div>
-      <div class="tl-content">
-        <div class="tl-fecha">${e.fecha || '—'}</div>
-        <div class="tl-texto">${e.texto}</div>
-      </div>
-    </div>`).join('') : '<div style="font-size:13px;color:#aaa">Sin eventos registrados</div>';
+  if (lead.ultimo_chat) {
+    eventos.push({ fecha: lead.ultimo_chat.split('T')[0], texto: `Última conversación en chat`, dot: 'dot-update' });
+  }
+  const ultimos = eventos.slice(-6).reverse();
+  document.getElementById('timeline').innerHTML = ultimos.length
+    ? ultimos.map(e => `<div class="tl-item"><div class="tl-dot ${e.dot}"></div><div class="tl-right"><div class="tl-fecha">${e.fecha||'—'}</div><div class="tl-texto">${e.texto}</div></div></div>`).join('')
+    : '<div style="font-size:12px;color:#bbb">Sin eventos registrados</div>';
 }
 
 function renderChat() {
   const history = lead.chat_history || [];
   if (!history.length) return;
-
   const container = document.getElementById('chatMessages');
   container.innerHTML = '';
-  history.forEach(m => appendMessage(m.role, m.content, m.fecha));
+  history.forEach(m => appendBubble(m.role, m.content, m.fecha));
   container.scrollTop = container.scrollHeight;
 }
 
-function appendMessage(role, content, fecha) {
+function appendBubble(role, content, fecha) {
   const container = document.getElementById('chatMessages');
-  const emptyEl = container.querySelector('.chat-empty');
-  if (emptyEl) emptyEl.remove();
+  document.getElementById('chatEmpty')?.remove();
 
   const div = document.createElement('div');
-  div.className = `msg msg-${role}`;
+  div.className = `msg msg-${role === 'user' ? 'user' : 'bot'}`;
   const hora = fecha ? new Date(fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) : '';
-  div.innerHTML = `<div class="msg-bubble">${escHtml(content)}</div><div class="msg-fecha">${hora}</div>`;
+  div.innerHTML = `<div class="bubble">${escHtml(content)}</div><div class="msg-hora">${hora}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function showUpdateChip() {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'update-chip';
+  div.textContent = '↑ Perfil del lead actualizado';
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
@@ -330,67 +374,93 @@ function appendMessage(role, content, fecha) {
 function showTyping() {
   const container = document.getElementById('chatMessages');
   const div = document.createElement('div');
-  div.className = 'msg typing';
-  div.id = 'typingIndicator';
-  div.innerHTML = `<div class="msg-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+  div.className = 'msg msg-bot typing';
+  div.id = 'typingDot';
+  div.innerHTML = `<div class="bubble"><div class="dot-t"></div><div class="dot-t"></div><div class="dot-t"></div></div>`;
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
 
 function hideTyping() {
-  document.getElementById('typingIndicator')?.remove();
+  document.getElementById('typingDot')?.remove();
 }
 
-async function enviarMensaje() {
+async function enviar() {
   const input = document.getElementById('chatInput');
-  const mensaje = input.value.trim();
-  if (!mensaje) return;
+  const msg = input.value.trim();
+  if (!msg || !phone) return;
 
   input.value = '';
   input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
 
-  appendMessage('user', mensaje, new Date().toISOString());
+  appendBubble('user', msg, new Date().toISOString());
   showTyping();
 
   try {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, mensaje })
+      body: JSON.stringify({ phone, mensaje: msg })
     });
     const data = await res.json();
     hideTyping();
 
     if (data.respuesta) {
-      appendMessage('assistant', data.respuesta, data.fecha);
-      // Actualizar lead local con nuevo historial
+      appendBubble('assistant', data.respuesta, data.fecha);
+
+      // Auto-actualizar panel si el perfil cambió
+      if (data.perfil_actualizado && data.lead_actualizado) {
+        const lu = data.lead_actualizado;
+        const g = getLastGestion();
+        if (lu.diagnostico !== undefined && lu.diagnostico !== null) g.diagnostico = lu.diagnostico;
+        if (lu.spin_s !== undefined && lu.spin_s !== null) g.spin_s = lu.spin_s;
+        if (lu.spin_p !== undefined && lu.spin_p !== null) g.spin_p = lu.spin_p;
+        if (lu.spin_i !== undefined && lu.spin_i !== null) g.spin_i = lu.spin_i;
+        if (lu.spin_n !== undefined && lu.spin_n !== null) g.spin_n = lu.spin_n;
+        if (lu.spin_etapa !== undefined && lu.spin_etapa !== null) g.spin_etapa = lu.spin_etapa;
+        if (lu.spin_siguiente !== undefined && lu.spin_siguiente !== null) g.spin_siguiente = lu.spin_siguiente;
+        if (lu.canal !== undefined && lu.canal !== null) g.canal = lu.canal;
+        if (lu.score !== undefined) lead.ultimo_score = lu.score;
+        if (lu.modelo !== undefined && lu.modelo !== null) lead.modelo = lu.modelo;
+        perfilActualizado = true;
+        renderPanel();
+        showUpdateChip();
+      }
+
+      // Actualizar historial local
       if (!lead.chat_history) lead.chat_history = [];
-      lead.chat_history.push({ role: 'user', content: mensaje, fecha: new Date().toISOString() });
+      lead.chat_history.push({ role: 'user', content: msg, fecha: new Date().toISOString() });
       lead.chat_history.push({ role: 'assistant', content: data.respuesta, fecha: data.fecha });
+
     } else {
-      appendMessage('assistant', 'Error al procesar el mensaje. Intentá de nuevo.', new Date().toISOString());
+      appendBubble('assistant', 'Error al procesar el mensaje.', new Date().toISOString());
     }
-  } catch (e) {
+  } catch(e) {
     hideTyping();
-    appendMessage('assistant', 'Error de red. Verificá la conexión.', new Date().toISOString());
+    appendBubble('assistant', 'Error de red. Verificá la conexión.', new Date().toISOString());
   }
 
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('chatInput').focus();
 }
 
+function quickSend(texto) {
+  document.getElementById('chatInput').value = texto;
+  enviar();
+}
+
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMensaje(); }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); }
 }
 
 function autoResize(el) {
   el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
 }
 
 function escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
 }
 
 init();
