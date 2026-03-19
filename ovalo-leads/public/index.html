@@ -508,12 +508,7 @@ function renderTabla(leads) {
 }
 
 function irALead(phone, nombre) {
-  switchTab('analizar');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  setTimeout(() => {
-    document.getElementById('crm').focus();
-    document.getElementById('crm').placeholder = `Lead: ${nombre} (${phone}) — pegá el historial del CRM acá...`;
-  }, 300);
+  location.href = 'lead.html?phone=' + encodeURIComponent(phone);
 }
 
 function resultadoLabel(r) {
