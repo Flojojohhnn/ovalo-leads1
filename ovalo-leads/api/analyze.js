@@ -35,6 +35,13 @@ REGLA CRÍTICA: La visita se propone SOLO cuando hay N. Antes de N, el siguiente
 
 ---
 
+EXTRACCIÓN DE DATOS DEL LEAD — OBLIGATORIO:
+Del historial que recibís, extraé siempre:
+- nombre_lead: nombre completo del cliente (sin el código 1.2.3.4 ni letras al final)
+- telefono_lead: número de teléfono en formato solo dígitos sin el prefijo internacional (ej: si ves +5492615016302 o 5492615016302, extraé 2615016302). Buscalo en campos como "Celular:", "Teléfono:", en números de WhatsApp, o en cualquier parte del historial.
+
+---
+
 LECTURA OBLIGATORIA DEL HISTORIAL:
 1. Identificá fecha y contenido EXACTO del último mensaje de Juan.
 2. ¿Hubo respuesta después? Si no, ese silencio es el punto de partida.
@@ -69,10 +76,10 @@ REGLAS DEL SCORE: cada criterio 1 a 5 MÁXIMO. Total máximo 25.
 
 ---
 
-RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después, sin backticks):
-{"titulo":"","score":{"intencion":{"puntaje":0,"nota":""},"capacidad_pago":{"puntaje":0,"nota":""},"urgencia":{"puntaje":0,"nota":""},"engagement":{"puntaje":0,"nota":""},"fit_producto":{"puntaje":0,"nota":""},"total":0},"clasificacion":"","diagnostico":"","spin":{"S":{"cubierto":false,"detalle":""},"P":{"cubierto":false,"detalle":""},"I":{"cubierto":false,"detalle":""},"N":{"cubierto":false,"detalle":""},"etapa_actual":"","siguiente_letra":""},"canal":"llamada","razon_canal":"","accion":{"llamada":{"objetivo":"","apertura":"","checklist":[{"punto":"","pregunta_sugerida":"","dato_que_buscas":""}],"si_no_atiende":""},"whatsapp":{"objetivo":"","mensaje":"","si_responde":""}},"plan_b":""}
+RESPONDÉ ÚNICAMENTE CON ESTE JSON (sin texto antes ni después, sin backticks, sin markdown):
+{"nombre_lead":"","telefono_lead":"","titulo":"","score":{"intencion":{"puntaje":0,"nota":""},"capacidad_pago":{"puntaje":0,"nota":""},"urgencia":{"puntaje":0,"nota":""},"engagement":{"puntaje":0,"nota":""},"fit_producto":{"puntaje":0,"nota":""},"total":0},"clasificacion":"","diagnostico":"","spin":{"S":{"cubierto":false,"detalle":""},"P":{"cubierto":false,"detalle":""},"I":{"cubierto":false,"detalle":""},"N":{"cubierto":false,"detalle":""},"etapa_actual":"","siguiente_letra":""},"canal":"llamada","razon_canal":"","accion":{"llamada":{"objetivo":"","apertura":"","checklist":[{"punto":"","pregunta_sugerida":"","dato_que_buscas":""}],"si_no_atiende":""},"whatsapp":{"objetivo":"","mensaje":"","si_responde":""}},"plan_b":""}
 
-Cuando canal es "llamada": completá accion.llamada completo y accion.whatsapp solo con si_no_atiende (mensaje de respaldo).
+Cuando canal es "llamada": completá accion.llamada completo y accion.whatsapp solo con si_no_atiende.
 Cuando canal es "whatsapp": completá accion.whatsapp completo.
 El checklist debe tener 4 a 6 ítems en orden SPIN empezando por la letra que falta.`;
 
@@ -122,7 +129,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { crm, wa, sensacion, telefono, nombre } = req.body;
+  const { crm, wa, sensacion } = req.body;
   if (!crm) return res.status(400).json({ error: 'El historial CRM es requerido.' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -158,8 +165,10 @@ export default async function handler(req, res) {
     try { parsed = JSON.parse(clean); }
     catch (e) { return res.status(500).json({ error: 'JSON parse error', raw: rawText.substring(0, 500) }); }
 
-    // Guardar en KV si hay teléfono
-    const phone = telefono ? normalizePhone(telefono) : null;
+    // Guardar en KV usando el teléfono extraído del historial
+    const rawPhone = parsed.telefono_lead || '';
+    const phone = rawPhone ? normalizePhone(rawPhone) : null;
+
     if (phone && phone.length >= 8) {
       const gestionId = Date.now().toString();
       const nuevaGestion = {
@@ -167,10 +176,10 @@ export default async function handler(req, res) {
         fecha: new Date().toISOString(),
         score: parsed.score?.total || 0,
         clasificacion: parsed.clasificacion || '',
-        spin_S: parsed.spin?.S?.cubierto || false,
-        spin_P: parsed.spin?.P?.cubierto || false,
-        spin_I: parsed.spin?.I?.cubierto || false,
-        spin_N: parsed.spin?.N?.cubierto || false,
+        spin_s: parsed.spin?.S?.cubierto || false,
+        spin_p: parsed.spin?.P?.cubierto || false,
+        spin_i: parsed.spin?.I?.cubierto || false,
+        spin_n: parsed.spin?.N?.cubierto || false,
         spin_etapa: parsed.spin?.etapa_actual || '',
         spin_siguiente: parsed.spin?.siguiente_letra || '',
         canal: parsed.canal || '',
@@ -181,20 +190,21 @@ export default async function handler(req, res) {
       };
 
       let lead = await kvGet(`lead:${phone}`);
-      const nombreFinal = nombre || parsed.titulo?.split('—')[0]?.trim() || 'Sin nombre';
+      const nombreFinal = parsed.nombre_lead || parsed.titulo?.split('—')[0]?.trim() || 'Sin nombre';
       const modeloFinal = parsed.titulo?.split('—')[1]?.trim() || '';
 
       if (!lead) {
         lead = {
           id: phone,
           nombre: nombreFinal,
-          telefono_original: telefono,
+          telefono_original: rawPhone,
           modelo: modeloFinal,
           primera_consulta: new Date().toISOString(),
           gestiones: []
         };
       } else {
         if (modeloFinal) lead.modelo = modeloFinal;
+        lead.nombre = nombreFinal;
       }
 
       lead.gestiones.push(nuevaGestion);
@@ -214,6 +224,10 @@ export default async function handler(req, res) {
         score: lead.ultimo_score,
         spin_siguiente: nuevaGestion.spin_siguiente,
         spin_etapa: nuevaGestion.spin_etapa,
+        spin_s: nuevaGestion.spin_s,
+        spin_p: nuevaGestion.spin_p,
+        spin_i: nuevaGestion.spin_i,
+        spin_n: nuevaGestion.spin_n,
         ultima_gestion: new Date().toISOString().split('T')[0],
         ultimo_resultado: lead.ultimo_resultado || null,
         total_gestiones: lead.gestiones.length
@@ -224,6 +238,10 @@ export default async function handler(req, res) {
 
       parsed._gestion_id = gestionId;
       parsed._phone = phone;
+      parsed._guardado = true;
+    } else {
+      parsed._guardado = false;
+      parsed._motivo = 'No se pudo extraer teléfono del historial';
     }
 
     return res.status(200).json(parsed);
