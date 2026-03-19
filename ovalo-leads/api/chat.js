@@ -148,13 +148,26 @@ Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.s
     if (!response.ok) return res.status(response.status).json({ error: data });
 
     const rawText = (data.content || []).map(b => b.text || '').join('').trim();
-    const clean = rawText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
 
     let parsed;
-    try { parsed = JSON.parse(clean); }
-    catch { parsed = { respuesta: rawText, actualizar_perfil: false, perfil: {} }; }
+    try {
+      const clean = rawText.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      try {
+        const match = rawText.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+        else throw new Error('no json');
+      } catch {
+        parsed = { respuesta: rawText, actualizar_perfil: false, perfil: {} };
+      }
+    }
 
-    const respuesta = parsed.respuesta || rawText;
+    // Evitar que la respuesta tenga JSON crudo
+    let respuesta = parsed.respuesta || '';
+    if (!respuesta || respuesta.trim().startsWith('{')) {
+      respuesta = rawText.replace(/\{[\s\S]*\}/, '').trim() || rawText;
+    }
     const ahora = new Date().toISOString();
 
     chatHistory.push({ role: 'user', content: mensaje, fecha: ahora });

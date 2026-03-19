@@ -240,6 +240,7 @@ tr:hover td { background: #fafaf8; cursor: pointer; }
           <th>Última gestión</th>
           <th>Resultado</th>
           <th>#</th>
+          <th></th>
         </tr>
       </thead>
       <tbody id="tbodyLeads">
@@ -503,6 +504,7 @@ function renderTabla(leads) {
       <td>${l.ultima_gestion||'—'}</td>
       <td>${resChip}</td>
       <td style="text-align:center">${l.total_gestiones||1}</td>
+      <td onclick="event.stopPropagation()"><button onclick="eliminarLead('${l.id}','${escHtml(l.nombre)}')" style="background:#fff2f2;color:#c00;border:1px solid #fcc;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;">✕</button></td>
     </tr>`;
   }).join('');
 }
@@ -514,6 +516,23 @@ function irALead(phone, nombre) {
 function resultadoLabel(r) {
   const map = { atendio:'✓ Atendió', no_atendio:'✗ No atendió', respondio_wp:'💬 WP', agendo_visita:'⭐ Agendó' };
   return map[r] || r;
+}
+
+async function eliminarLead(phone, nombre) {
+  if (!confirm(`¿Eliminar a ${nombre} y todo su historial?`)) return;
+  try {
+    await fetch('/api/delete-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, action: 'delete_lead' })
+    });
+    allLeads = allLeads.filter(l => l.id !== phone);
+    renderTabla(allLeads);
+    document.getElementById('st-total').textContent = allLeads.length;
+    document.getElementById('st-hot').textContent = allLeads.filter(l => l.score >= 20).length;
+    document.getElementById('st-warm').textContent = allLeads.filter(l => l.score >= 14 && l.score < 20).length;
+    document.getElementById('st-cold').textContent = allLeads.filter(l => l.score < 14).length;
+  } catch(e) { alert('Error al eliminar'); }
 }
 
 function escHtml(s) {

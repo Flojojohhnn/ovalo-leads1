@@ -147,6 +147,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .send-btn:hover { background: #00256b; }
 .send-btn:disabled { background: #b0b8c8; cursor: not-allowed; }
 .send-btn svg { width: 17px; height: 17px; fill: #fff; }
+.danger-btn { background: #fff2f2; color: #c00; border: 1px solid #fcc; border-radius: 7px; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.12s; }
+.danger-btn:hover { background: #ffe0e0; }
+.action-btn { background: #f0efeb; color: #555; border: 1px solid #ddd; border-radius: 7px; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.12s; }
+.action-btn:hover { background: #e4e2dc; }
+.mgmt-bar { padding: 12px 16px; border-bottom: 1px solid #eee; display: flex; gap: 8px; flex-wrap: wrap; background: #fff; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; display: flex; align-items: center; justify-content: center; }
+.modal-box { background: #fff; border-radius: 12px; padding: 24px; max-width: 360px; width: 90%; }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.modal-text { font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-cancel { background: #f0efeb; color: #555; border: 1px solid #ddd; border-radius: 7px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.modal-confirm { background: #c00; color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
 #loadingOverlay { position: fixed; inset: 0; background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center; z-index: 300; }
 .spinner { width: 30px; height: 30px; border: 3px solid #eee; border-top-color: #003087; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -174,6 +186,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="lead-nombre" id="leadNombre">—</div>
         <div class="lead-modelo" id="leadModelo">—</div>
       </div>
+    </div>
+
+    <div class="mgmt-bar">
+      <button class="action-btn" onclick="clearChat()">🗑 Borrar chat</button>
+      <button class="action-btn" onclick="deleteLastGestion()">↩ Deshacer último análisis</button>
+      <button class="danger-btn" onclick="confirmDeleteLead()">✕ Eliminar lead</button>
     </div>
 
     <!-- SCORE — abierto por defecto -->
@@ -465,7 +483,7 @@ function appendBubble(role, content, fecha) {
   const div = document.createElement('div');
   div.className = `msg msg-${role==='user'?'user':'bot'}`;
   const hora = fecha ? new Date(fecha).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '';
-  div.innerHTML = `<div class="bubble">${role==='user'?escHtml(content):escHtml(content)}</div><div class="msg-hora">${hora}</div>`;
+  div.innerHTML = `<div class="bubble">${role==='user'?escHtml(content):renderMd(content)}</div><div class="msg-hora">${hora}</div>`;
   c.appendChild(div);
   c.scrollTop = c.scrollHeight;
 }
@@ -539,6 +557,93 @@ function quickSend(t) { document.getElementById('chatInput').value = t; enviar()
 function handleKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } }
 function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMd(s) {
+  return escHtml(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+async function callManage(action, extra={}) {
+  try {
+    const res = await fetch('/api/delete-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, action, ...extra })
+    });
+    return res.json();
+  } catch { return { ok: false }; }
+}
+
+function showModal(title, text, confirmText, confirmFn, isDanger=true) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `<div class="modal-box">
+    <div class="modal-title">${title}</div>
+    <div class="modal-text">${text}</div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+      <button class="modal-confirm" style="${isDanger?'':'background:#003087'}" id="confirmBtn">${confirmText}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmBtn').onclick = async () => {
+    overlay.remove();
+    await confirmFn();
+  };
+}
+
+async function confirmDeleteLead() {
+  showModal(
+    'Eliminar lead',
+    `¿Estás seguro que querés eliminar a <strong>${lead.nombre}</strong> y todo su historial? Esta acción no se puede deshacer.`,
+    'Sí, eliminar',
+    async () => {
+      await callManage('delete_lead');
+      location.href = 'index.html';
+    }
+  );
+}
+
+async function deleteLastGestion() {
+  if (!lead.gestiones?.length) return;
+  showModal(
+    'Deshacer último análisis',
+    'Se va a borrar el análisis más reciente. El historial de chat se mantiene.',
+    'Deshacer',
+    async () => {
+      await callManage('delete_last_gestion');
+      lead.gestiones.pop();
+      if (lead.gestiones.length > 0) {
+        lead.ultimo_score = lead.gestiones[lead.gestiones.length-1].score || 0;
+      }
+      renderPanel();
+    },
+    false
+  );
+}
+
+async function clearChat() {
+  showModal(
+    'Borrar historial de chat',
+    'Se va a borrar toda la conversación del chat con este lead. El análisis y los datos del perfil se mantienen.',
+    'Borrar chat',
+    async () => {
+      await callManage('clear_chat');
+      lead.chat_history = [];
+      const c = document.getElementById('chatMessages');
+      c.innerHTML = `<div class="chat-empty" id="chatEmpty">
+        <div class="ce-icon">💬</div>
+        <div class="ce-text">Chat borrado. El análisis del lead se mantiene.</div>
+        <div class="ce-hints">
+          <button class="ce-hint" onclick="quickSend('¿Cuál es el próximo paso con este lead?')">¿Cuál es el próximo paso?</button>
+          <button class="ce-hint" onclick="quickSend('Dame el mensaje de WhatsApp para contactar')">Generame el mensaje de WhatsApp</button>
+        </div>
+      </div>`;
+    },
+    false
+  );
+}
 
 init();
 </script>
