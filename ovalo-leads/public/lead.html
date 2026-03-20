@@ -581,7 +581,17 @@ async function enviar() {
         const g=getG();
         Object.keys(lu).forEach(k=>{
           if (lu[k]!==null&&lu[k]!==undefined) {
-            if (k==='score') lead.ultimo_score=lu[k];
+            if (k==='score') {
+              lead.ultimo_score=lu[k];
+              // Recalcular barras proporcionalmente al nuevo score
+              const ratio = lu[k] / 25;
+              const base = Math.round(lu[k] / 5);
+              g.score_intencion = Math.min(5, Math.max(1, base));
+              g.score_capacidad = Math.min(5, Math.max(1, base));
+              g.score_urgencia = Math.min(5, Math.max(1, Math.round(lu[k] / 7)));
+              g.score_engagement = Math.min(5, Math.max(1, Math.round(lu[k] / 7)));
+              g.score_fit = Math.min(5, Math.max(1, base));
+            }
             else if (k==='modelo') lead.modelo=lu[k];
             else g[k]=lu[k];
           }
