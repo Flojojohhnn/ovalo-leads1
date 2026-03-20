@@ -1,6 +1,6 @@
 const CHAT_SYSTEM = `Sos el asistente de ventas consultivo de Juan, asesor de Plan Óvalo Ford Goldstein Mendoza.
 
-Tenés acceso al análisis completo del lead y al historial de toda la conversación. Ayudás a Juan a gestionar este lead: respondés preguntas, actualizás el análisis cuando Juan aporta info nueva, y sugerís próximos pasos cuando te lo pide.
+Tenés acceso al análisis completo del lead y al historial de toda la conversación. Tu trabajo es ayudar a Juan a avanzar con este lead hacia una visita al salón.
 
 GRILLA VIGENTE MARZO 2026:
 - Maverick XLT 2.0 AWD 70/30: VM $55.517.200 | Cuotas fijas 2-13: $655.000/mes
@@ -12,14 +12,28 @@ GRILLA VIGENTE MARZO 2026:
 
 SPIN: S=Situación P=Problema I=Implicación N=Need-Payoff
 La visita se propone SOLO cuando hay N cubierto.
-Cuando Juan aporta info nueva que completa una letra SPIN, marcala como cubierta y describí qué información la cubre en "detalle".
+
+REGLA FUNDAMENTAL — NUNCA SUGERÍS DESCARTAR UN LEAD:
+Todos los leads se trabajan hasta lograr la visita al salón. No existe la opción de "descartar", "soltar" o "archivar". Si un lead tiene bajo puntaje o mucho tiempo sin respuesta, la estrategia es reactivación gradual, no abandono. Siempre hay un próximo paso posible.
 
 TONO: Conversacional, directo, colega de ventas. Español rioplatense.
-NUNCA usar guiones " - " en mensajes de WhatsApp sugeridos.
+NUNCA guiones " - " en mensajes de WhatsApp.
 
-FORMATO DE RESPUESTA — OBLIGATORIO, sin backticks, sin texto antes ni después:
+DETECCIÓN AUTOMÁTICA DE RESULTADOS DE CONTACTO:
+Si Juan menciona que hizo un contacto con el lead, detectá el resultado y registralo.
+Ejemplos:
+- "lo llamé y no atendió" → resultado: no_atendio
+- "me respondió el whatsapp" / "me contestó" → resultado: respondio_wp
+- "atendió pero dijo que..." / "hablé con él" → resultado: atendio
+- "agendó visita" / "va a venir" / "quedamos en que viene" → resultado: agendo_visita
+- "me dijo que..." / "comentó que..." sin confirmar canal → resultado: respondio_wp (default)
+Si hay resultado detectado, registralo en el JSON. Si no hay contacto mencionado, dejá registro_contacto en null.
+
+FORMATO DE RESPUESTA — SIEMPRE JSON, sin backticks, sin texto antes ni después:
 {
-  "respuesta": "tu respuesta conversacional acá",
+  "respuesta": "tu respuesta conversacional",
+  "registro_contacto": null,
+  "notas_contacto": "",
   "actualizar_perfil": false,
   "perfil": {
     "diagnostico": null,
@@ -27,25 +41,19 @@ FORMATO DE RESPUESTA — OBLIGATORIO, sin backticks, sin texto antes ni después
     "spin_p": null, "spin_p_detalle": null, "spin_p_falta": null,
     "spin_i": null, "spin_i_detalle": null, "spin_i_falta": null,
     "spin_n": null, "spin_n_detalle": null, "spin_n_falta": null,
-    "spin_etapa": null,
-    "spin_siguiente": null,
-    "canal": null,
-    "razon_canal": null,
-    "score_ajuste": null,
-    "modelo": null,
-    "accion_objetivo": null,
-    "accion_apertura": null,
-    "accion_checklist": null,
-    "accion_si_no_atiende": null,
+    "spin_etapa": null, "spin_siguiente": null,
+    "canal": null, "razon_canal": null,
+    "score_ajuste": null, "modelo": null,
+    "accion_objetivo": null, "accion_apertura": null,
+    "accion_checklist": null, "accion_si_no_atiende": null,
     "plan_b": null
   }
 }
 
-Reglas:
-- actualizar_perfil: true SOLO cuando Juan aporta info nueva que realmente cambia el análisis
-- Si una letra SPIN pasa a cubierta, incluí su detalle (qué info la cubre) y ponéle que_falta en vacío
-- Si una letra sigue sin cubrir pero sabés mejor qué falta, actualizá su que_falta
-- Todos los campos de perfil que no cambian van en null`;
+registro_contacto: "atendio" | "no_atendio" | "respondio_wp" | "agendo_visita" | null
+notas_contacto: resumen en una línea de lo que pasó en el contacto (para el historial)
+actualizar_perfil: true solo cuando hay info nueva que cambia el análisis
+Campos de perfil que no cambian van en null.`;
 
 function normalizePhone(raw) {
   const digits = String(raw || '').replace(/\D/g, '');
@@ -110,19 +118,17 @@ Score: ${lead.ultimo_score}/25 — ${g.clasificacion || ''}
 Diagnóstico: ${g.diagnostico || '—'}
 
 SPIN ACTUAL:
-S (Situación): ${g.spin_s ? 'CUBIERTO — ' + (g.spin_s_detalle || '') : 'FALTA — ' + (g.spin_s_falta || 'sin info')}
-P (Problema): ${g.spin_p ? 'CUBIERTO — ' + (g.spin_p_detalle || '') : 'FALTA — ' + (g.spin_p_falta || 'sin info')}
-I (Implicación): ${g.spin_i ? 'CUBIERTO — ' + (g.spin_i_detalle || '') : 'FALTA — ' + (g.spin_i_falta || 'sin info')}
-N (Need-Payoff): ${g.spin_n ? 'CUBIERTO — ' + (g.spin_n_detalle || '') : 'FALTA — ' + (g.spin_n_falta || 'sin info')}
-Etapa: ${g.spin_etapa || '—'} | Siguiente a completar: ${g.spin_siguiente || '—'}
+S: ${g.spin_s ? 'CUBIERTO — ' + (g.spin_s_detalle || '') : 'FALTA — ' + (g.spin_s_falta || 'sin info')}
+P: ${g.spin_p ? 'CUBIERTO — ' + (g.spin_p_detalle || '') : 'FALTA — ' + (g.spin_p_falta || 'sin info')}
+I: ${g.spin_i ? 'CUBIERTO — ' + (g.spin_i_detalle || '') : 'FALTA — ' + (g.spin_i_falta || 'sin info')}
+N: ${g.spin_n ? 'CUBIERTO — ' + (g.spin_n_detalle || '') : 'FALTA — ' + (g.spin_n_falta || 'sin info')}
+Siguiente: ${g.spin_siguiente || '—'}
 
-Canal recomendado: ${g.canal || '—'} — ${g.razon_canal || ''}
-Última acción sugerida: ${g.accion_objetivo || '—'}
-Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.split('T')[0]}: ${gg.resultado}${gg.notas_resultado ? ' ('+gg.notas_resultado+')' : ''}` : null).filter(Boolean).join(' | ') || 'Ninguno'}`;
+Canal: ${g.canal || '—'} | Objetivo: ${g.accion_objetivo || '—'}
+Historial de contactos: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.split('T')[0]}: ${gg.resultado}${gg.notas_resultado ? ' ('+gg.notas_resultado+')' : ''}` : null).filter(Boolean).join(' | ') || 'Ninguno'}`;
 
   const systemPrompt = CHAT_SYSTEM + '\n\n' + analisisContexto;
   const chatHistory = lead.chat_history || [];
-
   const messages = [
     ...chatHistory.map(m => ({ role: m.role, content: m.content })),
     { role: 'user', content: mensaje }
@@ -159,24 +165,43 @@ Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.s
         if (match) parsed = JSON.parse(match[0]);
         else throw new Error('no json');
       } catch {
-        parsed = { respuesta: rawText, actualizar_perfil: false, perfil: {} };
+        parsed = { respuesta: rawText, registro_contacto: null, actualizar_perfil: false, perfil: {} };
       }
     }
 
-    // Evitar que la respuesta tenga JSON crudo
     let respuesta = parsed.respuesta || '';
     if (!respuesta || respuesta.trim().startsWith('{')) {
       respuesta = rawText.replace(/\{[\s\S]*\}/, '').trim() || rawText;
     }
-    const ahora = new Date().toISOString();
 
+    const ahora = new Date().toISOString();
     chatHistory.push({ role: 'user', content: mensaje, fecha: ahora });
     chatHistory.push({ role: 'assistant', content: respuesta, fecha: ahora });
     lead.chat_history = chatHistory.slice(-40);
     lead.ultimo_chat = ahora;
 
-    let leadActualizado = null;
+    // Auto-registrar resultado de contacto si fue detectado
+    if (parsed.registro_contacto) {
+      const ultimaGestion = lead.gestiones[lead.gestiones.length - 1];
+      if (ultimaGestion) {
+        ultimaGestion.resultado = parsed.registro_contacto;
+        ultimaGestion.notas_resultado = parsed.notas_contacto || mensaje.substring(0, 100);
+        ultimaGestion.fecha_resultado = ahora;
+      }
+      lead.ultimo_resultado = parsed.registro_contacto;
 
+      // Actualizar índice
+      let index = await kvGet('leads:index') || [];
+      const idx = index.findIndex(l => l.id === id);
+      if (idx >= 0) {
+        index[idx].ultimo_resultado = parsed.registro_contacto;
+        index[idx].ultima_gestion = ahora.split('T')[0];
+      }
+      await kvSet('leads:index', index);
+    }
+
+    // Actualizar perfil si corresponde
+    let leadActualizado = null;
     if (parsed.actualizar_perfil && parsed.perfil) {
       const p = parsed.perfil;
       const ug = lead.gestiones[lead.gestiones.length - 1];
@@ -193,54 +218,10 @@ Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.s
         campos.forEach(campo => {
           if (p[campo] !== null && p[campo] !== undefined) ug[campo] = p[campo];
         });
-        if (p.score_ajuste !== null && p.score_ajuste !== undefined) {
-          lead.ultimo_score = Math.max(0, Math.min(25, (lead.ultimo_score || 0) + p.score_ajuste));
-        }
-        if (p.modelo !== null && p.modelo !== undefined) lead.modelo = p.modelo;
+        if (p.score_ajuste) lead.ultimo_score = Math.max(0, Math.min(25, (lead.ultimo_score || 0) + p.score_ajuste));
+        if (p.modelo) lead.modelo = p.modelo;
       }
-
-      // Actualizar índice si cambia score
-      if (p.score_ajuste) {
-        let index = await kvGet('leads:index') || [];
-        const idx = index.findIndex(l => l.id === id);
-        if (idx >= 0) {
-          const ug2 = lead.gestiones[lead.gestiones.length - 1];
-          index[idx].score = lead.ultimo_score;
-          index[idx].spin_s = ug2.spin_s;
-          index[idx].spin_p = ug2.spin_p;
-          index[idx].spin_i = ug2.spin_i;
-          index[idx].spin_n = ug2.spin_n;
-          index[idx].spin_siguiente = ug2.spin_siguiente;
-          await kvSet('leads:index', index);
-        }
-      }
-
-      leadActualizado = {
-        score: lead.ultimo_score,
-        modelo: lead.modelo,
-        diagnostico: lead.gestiones[lead.gestiones.length-1]?.diagnostico,
-        spin_s: lead.gestiones[lead.gestiones.length-1]?.spin_s,
-        spin_s_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_s_detalle,
-        spin_s_falta: lead.gestiones[lead.gestiones.length-1]?.spin_s_falta,
-        spin_p: lead.gestiones[lead.gestiones.length-1]?.spin_p,
-        spin_p_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_p_detalle,
-        spin_p_falta: lead.gestiones[lead.gestiones.length-1]?.spin_p_falta,
-        spin_i: lead.gestiones[lead.gestiones.length-1]?.spin_i,
-        spin_i_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_i_detalle,
-        spin_i_falta: lead.gestiones[lead.gestiones.length-1]?.spin_i_falta,
-        spin_n: lead.gestiones[lead.gestiones.length-1]?.spin_n,
-        spin_n_detalle: lead.gestiones[lead.gestiones.length-1]?.spin_n_detalle,
-        spin_n_falta: lead.gestiones[lead.gestiones.length-1]?.spin_n_falta,
-        spin_etapa: lead.gestiones[lead.gestiones.length-1]?.spin_etapa,
-        spin_siguiente: lead.gestiones[lead.gestiones.length-1]?.spin_siguiente,
-        canal: lead.gestiones[lead.gestiones.length-1]?.canal,
-        razon_canal: lead.gestiones[lead.gestiones.length-1]?.razon_canal,
-        accion_objetivo: lead.gestiones[lead.gestiones.length-1]?.accion_objetivo,
-        accion_apertura: lead.gestiones[lead.gestiones.length-1]?.accion_apertura,
-        accion_checklist: lead.gestiones[lead.gestiones.length-1]?.accion_checklist,
-        accion_si_no_atiende: lead.gestiones[lead.gestiones.length-1]?.accion_si_no_atiende,
-        plan_b: lead.gestiones[lead.gestiones.length-1]?.plan_b,
-      };
+      leadActualizado = { ...lead.gestiones[lead.gestiones.length-1], score: lead.ultimo_score, modelo: lead.modelo };
     }
 
     await kvSet(`lead:${id}`, lead);
@@ -248,6 +229,8 @@ Resultados registrados: ${lead.gestiones.map(gg => gg.resultado ? `${gg.fecha?.s
     return res.status(200).json({
       respuesta,
       fecha: ahora,
+      registro_contacto: parsed.registro_contacto || null,
+      notas_contacto: parsed.notas_contacto || null,
       perfil_actualizado: !!leadActualizado,
       lead_actualizado: leadActualizado
     });
