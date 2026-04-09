@@ -251,6 +251,13 @@ tr:hover td { background: #fafaf8; cursor: pointer; }
 </div>
 
 <script>
+const API_KEY = localStorage.getItem('ovalo_api_key') || '';
+function check401(resp) {
+  if (resp.status !== 401) return false;
+  alert('API key incorrecta o no configurada.\nEjecutá en la consola del navegador:\nlocalStorage.setItem("ovalo_api_key", "TU_KEY")');
+  return true;
+}
+
 let currentPhone = null;
 let currentGestionId = null;
 let resultadoSeleccionado = null;
@@ -279,9 +286,10 @@ async function analizar() {
   try {
     const resp = await fetch('/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
       body: JSON.stringify({ crm, wa, sensacion })
     });
+    if (check401(resp)) return;
     const data = await resp.json();
     if (!resp.ok || data.error) { mostrarError(JSON.stringify(data.error || data, null, 2)); return; }
     if (data._gestion_id) currentGestionId = data._gestion_id;
@@ -425,7 +433,7 @@ async function guardarResultado() {
   try {
     const res = await fetch('/api/resultado', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
       body: JSON.stringify({ phone: currentPhone, gestion_id: currentGestionId, resultado: resultadoSeleccionado, notas })
     });
     if (res.ok) {
@@ -459,7 +467,8 @@ function mostrarError(msg) {
 async function cargarGestiones() {
   document.getElementById('tbodyLeads').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#aaa">Cargando...</td></tr>';
   try {
-    const res = await fetch('/api/leads');
+    const res = await fetch('/api/leads', { headers: { 'X-API-Key': API_KEY } });
+    if (check401(res)) return;
     const data = await res.json();
     allLeads = data.leads || [];
     renderTabla(allLeads);
@@ -523,7 +532,7 @@ async function eliminarLead(phone, nombre) {
   try {
     await fetch('/api/delete-lead', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': API_KEY },
       body: JSON.stringify({ phone, action: 'delete_lead' })
     });
     allLeads = allLeads.filter(l => l.id !== phone);
