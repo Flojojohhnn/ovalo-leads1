@@ -15,10 +15,12 @@ async function kvGet(key) {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key');
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
   res.setHeader('Pragma', 'no-cache');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  const _secret = process.env.API_SECRET_KEY;
+  if (_secret && req.headers['x-api-key'] !== _secret) return res.status(401).json({ error: 'Unauthorized' });
 
   const index = await kvGet('leads:index') || [];
   return res.status(200).json({ leads: index, total: index.length });

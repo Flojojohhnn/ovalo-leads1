@@ -303,6 +303,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <script>
+const API_KEY = localStorage.getItem('ovalo_api_key') || '';
+function check401(resp) {
+  if (resp.status !== 401) return false;
+  alert('API key incorrecta o no configurada.\nEjecutá en la consola del navegador:\nlocalStorage.setItem("ovalo_api_key", "TU_KEY")');
+  return true;
+}
+
 const params = new URLSearchParams(location.search);
 const phone = params.get('phone');
 let lead = null;
@@ -335,7 +342,8 @@ function switchTab(tab) {
 async function init() {
   if (!phone) { location.href='index.html'; return; }
   try {
-    const res = await fetch(`/api/lead?phone=${encodeURIComponent(phone)}`);
+    const res = await fetch(`/api/lead?phone=${encodeURIComponent(phone)}`, { headers: { 'X-API-Key': API_KEY } });
+    if (check401(res)) return;
     const data = await res.json();
     if (!data.found) { location.href='index.html'; return; }
     lead = data.lead;
@@ -349,7 +357,8 @@ function getG() { return lead.gestiones?.[lead.gestiones.length-1] || {}; }
 
 function renderPanel() {
   const g = getG();
-  const score = lead.ultimo_score || 0;
+  const _barSum = barConfig.reduce((s,b)=>s+(g[b.key]||0),0);
+  const score = _barSum > 0 ? _barSum : (lead.ultimo_score||0);
   const iniciales = (lead.nombre||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
   document.getElementById('avatar').textContent = iniciales;
@@ -570,7 +579,7 @@ async function enviar() {
 
   try {
     const res=await fetch('/api/chat',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
       body:JSON.stringify({phone,mensaje:msg})
     });
     const data=await res.json();
@@ -627,7 +636,7 @@ async function enviar() {
 async function callManage(action,extra={}) {
   try {
     const res=await fetch('/api/delete-lead',{method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','X-API-Key':API_KEY},
       body:JSON.stringify({phone,action,...extra})});
     return res.json();
   } catch {return{ok:false};}
